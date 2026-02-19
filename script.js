@@ -1,38 +1,43 @@
 // script.js
 
-// Smooth scrolling for anchor links
-const smoothScroll = (target) => {
-    document.querySelector(target).scrollIntoView({
-        behavior: 'smooth'
-    });
-};
-
-// Mobile menu toggle functionality
-const mobileMenuToggle = () => {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('active');
-};
-
-// Button click animations
-const buttonClickAnimation = (button) => {
-    button.classList.add('clicked');
-    setTimeout(() => button.classList.remove('clicked'), 300);
-};
-
-// Event listeners
+// Smooth Scrolling
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        smoothScroll(this.getAttribute('href'));
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
     });
 });
 
-document.getElementById('mobile-menu-toggle').addEventListener('click', mobileMenuToggle);
-
-document.querySelectorAll('.button').forEach(button => {
-    button.addEventListener('click', function () {
-        buttonClickAnimation(this);
-    });
+// Form Handling
+const form = document.querySelector('form');
+form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+    // Handle the form data here
+    console.log('Form submitted:', formData);
 });
 
-// Additional interactivity features can be added here...
+// WhatsApp Integration
+function sendWhatsAppMessage(message) {
+    const number = '1234567890'; // Replace with actual number
+    const url = `https://api.whatsapp.com/send?phone=${number}&text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+}
+
+// Mobile Menu Toggle
+const menuToggle = document.querySelector('.menu-toggle');
+const menu = document.querySelector('.menu');
+menuToggle.addEventListener('click', function() {
+    menu.classList.toggle('active');
+});
+
+// Interactive Features
+const interactiveElements = document.querySelectorAll('.interactive');
+interactiveElements.forEach(element => {
+    element.addEventListener('click', function() {
+        this.classList.toggle('active');
+    });
+});
