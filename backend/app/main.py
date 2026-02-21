@@ -20,10 +20,12 @@ os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 app = FastAPI(title="Jenan Business API", version="1.0.0")
 
-# CORS — restrict allow_origins to specific domains in production
+# CORS: origins are read from ALLOWED_ORIGINS env var (comma-separated).
+# Defaults to "*" for local development — set explicit origins in production.
+origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
