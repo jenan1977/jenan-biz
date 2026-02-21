@@ -52,7 +52,7 @@ const Purchases: React.FC = () => {
   const updateItem = (idx: number, field: keyof PurchaseItem, val: string | number) => {
     setForm(f => {
       const items = [...f.items]
-      items[idx] = { ...items[idx], [field]: field === 'product_id' ? +val : +val }
+      items[idx] = { ...items[idx], [field]: +val }
       if (field === 'product_id') {
         const prod = products.find(p => p.id === +val)
         if (prod) items[idx].unit_price = prod.cost_price
