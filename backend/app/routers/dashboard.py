@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import date
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func

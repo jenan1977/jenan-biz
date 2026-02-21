@@ -49,7 +49,12 @@ def create_sale_invoice(db: Session, invoice: SaleInvoiceCreate, user_id: int) -
         if not product:
             raise ValueError(f"Product {item.product_id} not found")
 
-        cost_price = product.cost_price
+        if product.stock_quantity < item.quantity:
+            raise ValueError(
+                f"Insufficient stock for product '{product.name}': "
+                f"available {product.stock_quantity}, requested {item.quantity}"
+            )
+        
         total_price = item.quantity * item.unit_price
         item_profit = (item.unit_price - cost_price) * item.quantity
 
