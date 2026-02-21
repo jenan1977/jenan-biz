@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: jenan
+      POSTGRES_PASSWORD: jenan123
+      POSTGRES_DB: jenan_biz
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://jenan:jenan123@db:5432/jenan_biz
+      # Override SECRET_KEY with a strong random value in production (e.g. via .env file or secrets manager)
+      SECRET_KEY: ${SECRET_KEY:-change-this-to-a-secure-random-value-in-production}
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  postgres_data:
