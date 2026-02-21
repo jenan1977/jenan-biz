@@ -44,8 +44,15 @@ class InventoryService:
 
     @staticmethod
     def adjust_stock(db: Session, product_id: int, quantity: float, notes: str = None):
+        """Adjust stock by the given quantity (positive = add, negative = deduct)."""
         stock = InventoryService.get_or_create_stock(db, product_id)
-        stock.current_quantity = quantity
+        new_quantity = stock.current_quantity + quantity
+        if new_quantity < 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Adjustment would result in negative stock for product_id={product_id}",
+            )
+        stock.current_quantity = new_quantity
         movement = StockMovement(
             product_id=product_id,
             movement_type="ADJUSTMENT",

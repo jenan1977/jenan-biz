@@ -19,8 +19,8 @@ services:
       - db
     environment:
       DATABASE_URL: postgresql://jenan:jenan123@db:5432/jenan_biz
-      # Override SECRET_KEY with a strong random value in production (e.g. via .env file or secrets manager)
-      SECRET_KEY: ${SECRET_KEY:-change-this-to-a-secure-random-value-in-production}
+      # SECRET_KEY must be set via environment variable or .env file — no default is provided
+      SECRET_KEY: ${SECRET_KEY}
     volumes:
       - ./uploads:/app/uploads
 
