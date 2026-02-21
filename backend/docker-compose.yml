@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: jenan
+      POSTGRES_PASSWORD: jenan123
+      POSTGRES_DB: jenan_biz
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://jenan:jenan123@db:5432/jenan_biz
+      # SECRET_KEY must be set via environment variable or .env file — no default is provided
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  postgres_data:
