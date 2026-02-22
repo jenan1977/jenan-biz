@@ -4,33 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/blog.css">
-    <title>أكاديمية الأعمال الذكية</title>
+    <title>جنان بيز - بوابة رواد الأعمال</title>
 </head>
 <body>
-    <header>
-        <h1>أكاديمية الأعمال الذكية</h1>
-        <p>رحلتك نحو عالم المال</p>
-    </header>
-    <main>
-        <section>
-            <h2>ابدأ هنا | Start Here</h2>
-            <div class="goal-chips">
-                <button>زيادة دخل</button>
-                <button>مشروع</button>
-                <button>تمويل</button>
-                <button>متجر</button>
-                <button>تسويق</button>
-                <button>إدارة</button>
+    <!-- Header with navigation back to main site -->
+    <header class="blog-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>جنان بيز</h1>
+                <p class="tagline">رحلتك نحو المال</p>
             </div>
-            <input type="text" id="search" placeholder="بحث...">
+            <a href="../index.html" class="back-btn">← العودة للرئيسية</a>
+        </div>
+    </header>
+
+    <main class="blog-main">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h2>بوابة روّاد الأعمال</h2>
+            <p>أدوات، مسارات، وخطط عملية لبناء عملك الخاص وتنميته</p>
         </section>
-        <section>
-            <h2>المكتبة الذكية | Smart Library</h2>
-            <div class="card-container">
-                <!-- Cards from content.js will be appended here -->
+
+        <!-- "Start Here" Section -->
+        <section class="start-here-section">
+            <h2>ابدأ هنا | Start Here</h2>
+            <p>اختر هدفك لنساعدك في اختيار المسار الأنسب:</p>
+            <div class="goal-chips">
+                <button class="chip" data-goal="income">💰 زيادة الدخل</button>
+                <button class="chip" data-goal="startup">🚀 مشروع جديد</button>
+                <button class="chip" data-goal="business">🏢 تطوير عملي الحالي</button>
+                <button class="chip" data-goal="funding">💳 البحث عن التمويل</button>
+                <button class="chip" data-goal="management">📊 إدارة وتنظيم</button>
+                <button class="chip" data-goal="marketing">📢 التسويق والمبيعات</button>
+            </div>
+        </section>
+
+        <!-- Smart Library Section -->
+        <section class="smart-library-section">
+            <div class="library-header">
+                <h2>المكتبة الذكية | Smart Library</h2>
+                <div class="library-controls">
+                    <input type="text" id="search-input" class="search-box" placeholder="🔍 بحث...">
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">الكل</button>
+                        <button class="filter-btn" data-filter="roadmap">مسارات</button>
+                        <button class="filter-btn" data-filter="tool">أدوات</button>
+                        <button class="filter-btn" data-filter="template">قوالب</button>
+                        <button class="filter-btn" data-filter="calculator">حاسبات</button>
+                        <button class="filter-btn" data-filter="article">مقالات</button>
+                    </div>
+                </div>
+            </div>
+            <div class="cards-container" id="cards-container">
+                <!-- Cards will be loaded by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Recommendations Section -->
+        <section class="recommendations-section">
+            <h2>توصيات لك | Recommended for You</h2>
+            <div class="recommendations-container" id="recommendations-container">
+                <!-- Will be populated by JavaScript based on user interests -->
+            </div>
+        </section>
+
+        <!-- Interests/Favorites Section -->
+        <section class="interests-section">
+            <h2>اهتماماتك | Your Interests</h2>
+            <div class="interests-container" id="interests-container">
+                <!-- Will show saved interests from localStorage -->
             </div>
         </section>
     </main>
+
+    <!-- Modal for Article View -->
+    <div class="modal" id="article-modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <article id="article-content">
+                <!-- Article content will be loaded here -->
+            </article>
+        </div>
+    </div>
+
+    <footer class="blog-footer">
+        <p>&copy; 2026 جنان بيز - بوابة رواد الأعمال. جميع الحقوق محفوظة.</p>
+    </footer>
+
     <script src="./assets/content.js"></script>
     <script src="./assets/blog.js"></script>
 </body>
