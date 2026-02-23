@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>جنان بيز - محلل المشاريع الذكي</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1a6e3c;
+      --primary-light: #27a35a;
+      --secondary: #f5a623;
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --border: #d0d7e3;
+      --text: #1d2633;
+      --text-muted: #6b7a94;
+      --error: #c0392b;
+      --success: #1a6e3c;
+      --radius: 10px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header .logo {
+      font-size: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 32px auto;
+      padding: 0 16px 48px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    label .required {
+      color: var(--error);
+      margin-right: 2px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      direction: rtl;
+      background: #fafbfc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      color: var(--text);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(39,163,90,0.12);
+      background: #fff;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+      font-family: inherit;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: var(--primary-light);
+    }
+
+    .btn-submit:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Progress */
+    #progress-section { display: none; }
+
+    .progress-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .progress-bar-wrap {
+      background: var(--border);
+      border-radius: 99px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.5s ease;
+      animation: progress-pulse 1.5s infinite alternate;
+    }
+
+    @keyframes progress-pulse {
+      from { opacity: 1; }
+      to   { opacity: 0.7; }
+    }
+
+    /* Result */
+    #result-section { display: none; }
+
+    .result-content {
+      background: #f0faf4;
+      border: 1.5px solid #b7e5cb;
+      border-radius: var(--radius);
+      padding: 24px;
+      white-space: pre-wrap;
+      line-height: 1.75;
+      font-size: 0.93rem;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn-secondary {
+      padding: 10px 20px;
+      background: var(--surface);
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      border-radius: 7px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-secondary:hover {
+      background: #e8f5ee;
+    }
+
+    /* Error */
+    #error-section { display: none; }
+
+    .error-box {
+      background: #fdf0ee;
+      border: 1.5px solid #f5c6c0;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      color: var(--error);
+      font-size: 0.9rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge-pending   { background: #fff3cd; color: #856404; }
+    .badge-processing { background: #cff4fc; color: #055160; }
+    .badge-completed  { background: #d1e7dd; color: #0f5132; }
+    .badge-failed     { background: #f8d7da; color: #842029; }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .card { padding: 20px 16px; }
+      header { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🤖</div>
+  <div>
+    <h1>جنان بيز - محلل المشاريع الذكي</h1>
+    <p>أدخل تفاصيل مشروعك وسيقوم الذكاء الاصطناعي بتحليله بشكل شامل</p>
+  </div>
+</header>
+
+<main>
+  <!-- Form -->
+  <form id="analyze-form">
+
+    <!-- Section 1: Basic Info -->
+    <div class="card">
+      <div class="card-title">📋 المعلومات الأساسية</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="project_name">اسم المشروع <span class="required">*</span></label>
+          <input type="text" id="project_name" name="project_name" placeholder="مثال: تطبيق توصيل الطعام" required />
+        </div>
+        <div class="form-group">
+          <label for="industry">القطاع / الصناعة</label>
+          <input type="text" id="industry" name="industry" placeholder="مثال: التكنولوجيا، التجزئة" />
+        </div>
+        <div class="form-group full-width">
+          <label for="project_description">وصف المشروع <span class="required">*</span></label>
+          <textarea id="project_description" name="project_description" placeholder="اكتب وصفاً مختصراً لفكرة مشروعك..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="location">الموقع الجغرافي</label>
+          <input type="text" id="location" name="location" placeholder="مثال: الرياض، السعودية" />
+        </div>
+        <div class="form-group">
+          <label for="current_stage">المرحلة الحالية</label>
+          <select id="current_stage" name="current_stage">
+            <option value="">-- اختر المرحلة --</option>
+            <option value="فكرة">فكرة</option>
+            <option value="نموذج أولي">نموذج أولي (Prototype)</option>
+            <option value="مرحلة الإطلاق">مرحلة الإطلاق</option>
+            <option value="نمو مبكر">نمو مبكر</option>
+            <option value="نمو متسارع">نمو متسارع</option>
+            <option value="ناضج">ناضج</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Market & Competition -->
+    <div class="card">
+      <div class="card-title">📊 السوق والمنافسة</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="target_audience">الفئة المستهدفة</label>
+          <input type="text" id="target_audience" name="target_audience" placeholder="مثال: الشباب 18-35 سنة" />
+        </div>
+        <div class="form-group">
+          <label for="market_size">حجم السوق المستهدف</label>
+          <input type="text" id="market_size" name="market_size" placeholder="مثال: 500 مليون ريال سنوياً" />
+        </div>
+        <div class="form-group full-width">
+          <label for="competitors">المنافسون الرئيسيون</label>
+          <textarea id="competitors" name="competitors" placeholder="اذكر أبرز المنافسين في السوق..."></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label for="competitive_advantages">المميزات التنافسية</label>
+          <textarea id="competitive_advantages" name="competitive_advantages" placeholder="ما الذي يميز مشروعك عن المنافسين؟"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Financial -->
+    <div class="card">
+      <div class="card-title">💰 الجانب المالي</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="initial_capital">رأس المال الأولي</label>
+          <input type="text" id="initial_capital" name="initial_capital" placeholder="مثال: 200,000 ريال" />
+        </div>
+        <div class="form-group">
+          <label for="funding_sources">مصادر التمويل</label>
+          <input type="text" id="funding_sources" name="funding_sources" placeholder="مثال: ذاتي، مستثمرون" />
+        </div>
+        <div class="form-group">
+          <label for="revenue_model">نموذج الإيراد</label>
+          <input type="text" id="revenue_model" name="revenue_model" placeholder="مثال: اشتراكات، عمولة، إعلانات" />
+        </div>
+        <div class="form-group">
+          <label for="financial_projections">التوقعات المالية</label>
+          <input type="text" id="financial_projections" name="financial_projections" placeholder="مثال: تعادل بعد 18 شهراً" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Team & Operations -->
+    <div class="card">
+      <div class="card-title">👥 الفريق والتشغيل</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="team">فريق العمل</label>
+          <input type="text" id="team" name="team" placeholder="مثال: 3 مطورين، مصمم، مدير تسويق" />
+        </div>
+        <div class="form-group">
+          <label for="existing_expertise">الخبرات المتوفرة</label>
+          <input type="text" id="existing_expertise" name="existing_expertise" placeholder="مثال: خبرة 5 سنوات في التقنية" />
+        </div>
+        <div class="form-group">
+          <label for="technology_used">التكنولوجيا المستخدمة</label>
+          <input type="text" id="technology_used" name="technology_used" placeholder="مثال: React, Node.js, AWS" />
+        </div>
+        <div class="form-group">
+          <label for="distribution_channels">قنوات التوزيع</label>
+          <input type="text" id="distribution_channels" name="distribution_channels" placeholder="مثال: تطبيق موبايل، موقع إلكتروني" />
+        </div>
+        <div class="form-group full-width">
+          <label for="products_services">المنتجات / الخدمات</label>
+          <textarea id="products_services" name="products_services" placeholder="صف منتجاتك أو خدماتك الرئيسية..."></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label for="marketing_strategy">استراتيجية التسويق</label>
+          <textarea id="marketing_strategy" name="marketing_strategy" placeholder="كيف ستجذب العملاء؟"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Goals & Risks -->
+    <div class="card">
+      <div class="card-title">🎯 الأهداف والمخاطر</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="short_term_goals">الأهداف قصيرة المدى</label>
+          <textarea id="short_term_goals" name="short_term_goals" placeholder="مثال: 1000 مستخدم خلال 6 أشهر"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="long_term_goals">الأهداف طويلة المدى</label>
+          <textarea id="long_term_goals" name="long_term_goals" placeholder="مثال: التوسع الإقليمي خلال 3 سنوات"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="challenges">التحديات المتوقعة</label>
+          <textarea id="challenges" name="challenges" placeholder="ما هي أبرز التحديات التي تتوقعها؟"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="risks">مخاطر المشروع</label>
+          <textarea id="risks" name="risks" placeholder="اذكر المخاطر المحتملة وكيفية التعامل معها..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="regulatory_constraints">القيود التنظيمية</label>
+          <input type="text" id="regulatory_constraints" name="regulatory_constraints" placeholder="مثال: ترخيص، لوائح قطاعية" />
+        </div>
+        <div class="form-group">
+          <label for="timeline">الجدول الزمني للمشروع</label>
+          <input type="text" id="timeline" name="timeline" placeholder="مثال: إطلاق بعد 6 أشهر" />
+        </div>
+        <div class="form-group">
+          <label for="success_metrics">مقاييس النجاح</label>
+          <input type="text" id="success_metrics" name="success_metrics" placeholder="مثال: حجم المبيعات، عدد المستخدمين" />
+        </div>
+        <div class="form-group">
+          <label for="exit_strategy">استراتيجية الخروج</label>
+          <input type="text" id="exit_strategy" name="exit_strategy" placeholder="مثال: الاستحواذ، الطرح العام" />
+        </div>
+        <div class="form-group">
+          <label for="potential_partnerships">شراكات محتملة</label>
+          <input type="text" id="potential_partnerships" name="potential_partnerships" placeholder="مثال: شراكة مع شركات الشحن" />
+        </div>
+        <div class="form-group">
+          <label for="sustainability">الاستدامة والمسؤولية الاجتماعية</label>
+          <input type="text" id="sustainability" name="sustainability" placeholder="كيف يساهم مشروعك في المجتمع؟" />
+        </div>
+        <div class="form-group full-width">
+          <label for="additional_notes">ملاحظات إضافية</label>
+          <textarea id="additional_notes" name="additional_notes" placeholder="أي معلومات إضافية تريد إضافتها..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submit-btn">
+      🚀 ابدأ تحليل المشروع
+    </button>
+  </form>
+
+  <!-- Progress -->
+  <div id="progress-section" class="card">
+    <div class="card-title">⏳ جارٍ التحليل...</div>
+    <p class="progress-label" id="progress-label">جارٍ إرسال البيانات...</p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+    <p style="text-align:center; margin-top:12px; font-size:0.85rem; color:var(--text-muted)">
+      يرجى الانتظار، قد يستغرق التحليل بضع ثوانٍ حتى دقيقتين
+    </p>
+  </div>
+
+  <!-- Result -->
+  <div id="result-section" class="card">
+    <div class="card-title">✅ نتائج التحليل</div>
+    <div class="result-content" id="result-content"></div>
+    <div class="result-actions">
+      <button class="btn-secondary" onclick="copyResult()">📋 نسخ النتيجة</button>
+      <button class="btn-secondary" onclick="resetForm()">🔄 تحليل مشروع جديد</button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="error-section" class="card">
+    <div class="card-title" style="color:var(--error)">❌ حدث خطأ</div>
+    <div class="error-box" id="error-content"></div>
+    <div class="result-actions" style="margin-top:16px">
+      <button class="btn-secondary" onclick="resetForm()">🔄 المحاولة مجدداً</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  const POLL_INTERVAL_MS = 2000;
+  const POLL_TIMEOUT_MS = 180000; // 3 minutes
+  const MAX_POLL_ATTEMPTS = Math.floor(POLL_TIMEOUT_MS / POLL_INTERVAL_MS);
+
+  let pollingTimer = null;
+  let pollCount = 0;
+  let currentJobId = null;
+
+  const form = document.getElementById('analyze-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const progressSection = document.getElementById('progress-section');
+  const progressLabel = document.getElementById('progress-label');
+  const progressBar = document.getElementById('progress-bar');
+  const resultSection = document.getElementById('result-section');
+  const resultContent = document.getElementById('result-content');
+  const errorSection = document.getElementById('error-section');
+  const errorContent = document.getElementById('error-content');
+
+  function showProgress(label, pct) {
+    progressSection.style.display = 'block';
+    resultSection.style.display = 'none';
+    errorSection.style.display = 'none';
+    progressLabel.textContent = label || 'جارٍ المعالجة...';
+    progressBar.style.width = (pct || 10) + '%';
+  }
+
+  function showResult(text) {
+    progressSection.style.display = 'none';
+    resultSection.style.display = 'block';
+    errorSection.style.display = 'none';
+    resultContent.textContent = text;
+  }
+
+  function showError(msg) {
+    progressSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    errorSection.style.display = 'block';
+    errorContent.textContent = msg || 'حدث خطأ غير معروف.';
+  }
+
+  function resetForm() {
+    clearInterval(pollingTimer);
+    pollingTimer = null;
+    pollCount = 0;
+    currentJobId = null;
+
+    form.style.display = 'block';
+    progressSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    errorSection.style.display = 'none';
+    submitBtn.disabled = false;
+    submitBtn.textContent = '🚀 ابدأ تحليل المشروع';
+  }
+
+  function copyResult() {
+    const text = resultContent.textContent;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => alert('تم النسخ!'));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('تم النسخ!');
+    }
+  }
+
+  async function pollJob(jobId) {
+    pollCount++;
+    const pct = Math.min(10 + pollCount * 2, 90);
+    progressBar.style.width = pct + '%';
+
+    if (pollCount > MAX_POLL_ATTEMPTS) {
+      clearInterval(pollingTimer);
+      showError('انتهت مهلة الانتظار. يرجى المحاولة مجدداً.');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    try {
+      const resp = await fetch(`/api/analyzer/jobs/${jobId}`);
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        clearInterval(pollingTimer);
+        showError(data.error || `خطأ في الخادم (${resp.status})`);
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const job = await resp.json();
+
+      if (job.status === 'completed') {
+        clearInterval(pollingTimer);
+        progressBar.style.width = '100%';
+        setTimeout(() => showResult(job.result || ''), 300);
+        submitBtn.disabled = false;
+        form.style.display = 'none';
+      } else if (job.status === 'failed') {
+        clearInterval(pollingTimer);
+        showError(job.error || 'فشل التحليل. يرجى المحاولة مجدداً.');
+        submitBtn.disabled = false;
+      } else if (job.status === 'processing') {
+        progressLabel.textContent = 'الذكاء الاصطناعي يحلل مشروعك...';
+      }
+    } catch (err) {
+      // Network error – keep polling
+      progressLabel.textContent = 'جارٍ إعادة الاتصال...';
+    }
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const body = {};
+    formData.forEach((value, key) => { if (value) body[key] = value; });
+
+    if (!body.project_name && !body.project_description) {
+      alert('يرجى إدخال اسم المشروع أو وصفه على الأقل.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ جارٍ الإرسال...';
+    showProgress('جارٍ إرسال بيانات المشروع...', 5);
+
+    try {
+      const resp = await fetch('/api/analyzer/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        showError(data.error || `خطأ في الخادم (${resp.status})`);
+        submitBtn.disabled = false;
+        return;
+      }
+
+      currentJobId = data.jobId;
+      pollCount = 0;
+      showProgress('تم استقبال الطلب، جارٍ التحليل...', 10);
+
+      pollingTimer = setInterval(() => pollJob(currentJobId), POLL_INTERVAL_MS);
+    } catch (err) {
+      showError('تعذر الاتصال بالخادم. تأكد من تشغيل الخادم وحاول مجدداً.');
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
