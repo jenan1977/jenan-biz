@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كتابة مقال - جنان بيز</title>
+    <link rel="stylesheet" href="../blog/assets/blog.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8f9fa; color: #333; }
+        .page-header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; }
+        .page-header a { color: #aaa; text-decoration: none; }
+        .editor-container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: #fff; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: .4rem; color: #444; font-size: .9rem; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: .8rem; border: 1px solid #ddd; border-radius: 8px; font-size: .95rem; font-family: inherit; box-sizing: border-box; }
+        .form-group textarea { min-height: 350px; resize: vertical; line-height: 1.6; direction: auto; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn { padding: .7rem 1.5rem; border-radius: 8px; border: none; cursor: pointer; font-size: .95rem; display: inline-flex; align-items: center; gap: .4rem; }
+        .btn-primary { background: #e94560; color: #fff; }
+        .btn-secondary { background: #6366f1; color: #fff; }
+        .btn-success { background: #10b981; color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid #ccc; color: #555; }
+        .btn:hover { opacity: .88; }
+        .actions-bar { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .ai-section { border-top: 2px dashed #e0e7ff; margin-top: 1.5rem; padding-top: 1.5rem; }
+        .ai-section h3 { color: #6366f1; margin: 0 0 1rem; }
+        .ai-result { background: #f8faff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 1rem; margin-top: 1rem; white-space: pre-wrap; direction: auto; display: none; }
+        .tag-input { display: flex; flex-wrap: wrap; gap: .4rem; padding: .5rem; border: 1px solid #ddd; border-radius: 8px; min-height: 44px; align-items: center; cursor: text; }
+        .tag-chip { background: #e0e7ff; color: #4338ca; padding: .2rem .6rem; border-radius: 12px; font-size: .85rem; display: flex; align-items: center; gap: .3rem; }
+        .tag-chip button { background: none; border: none; cursor: pointer; color: #888; padding: 0; font-size: .9rem; }
+        .tag-input input { border: none; outline: none; flex: 1; min-width: 100px; font-size: .9rem; }
+        .preview-panel { background: #fafafa; border-radius: 8px; padding: 1.5rem; border: 1px solid #e0e7ff; line-height: 1.8; }
+        .preview-panel h2, .preview-panel h3 { color: #1a1a2e; }
+        .status-msg { padding: .8rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: .9rem; display: none; }
+        .status-msg.success { background: #d1fae5; color: #065f46; }
+        .status-msg.error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <a href="blog-list.html">← قائمة المقالات</a>
+        <span style="color:#555;">|</span>
+        <span id="editor-title" style="color:#ccc;">مقال جديد</span>
+    </div>
+
+    <div class="editor-container">
+        <div id="status-msg" class="status-msg"></div>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="article-title">عنوان المقال *</label>
+                <input type="text" id="article-title" placeholder="أدخل عنواناً جذاباً للمقال...">
+            </div>
+            <div class="form-group">
+                <label for="article-summary">الملخص (اختياري)</label>
+                <input type="text" id="article-summary" placeholder="جملة أو جملتان تصفان المقال...">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="article-status">الحالة</label>
+                    <select id="article-status">
+                        <option value="draft">مسودة</option>
+                        <option value="published">منشور</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="article-author">الكاتب</label>
+                    <input type="text" id="article-author" placeholder="اسم الكاتب">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="article-cover">رابط صورة الغلاف (اختياري)</label>
+                <input type="url" id="article-cover" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label>الوسوم</label>
+                <div class="tag-input" id="tag-input" onclick="document.getElementById('tag-text').focus()">
+                    <input type="text" id="tag-text" placeholder="اكتب وسماً واضغط Enter...">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="article-body">محتوى المقال (Markdown) *</label>
+                <textarea id="article-body" placeholder="اكتب محتوى المقال بتنسيق Markdown...
+
+# عنوان رئيسي
+## عنوان فرعي
+
+نص المقال...
+
+- نقطة 1
+- نقطة 2
+
+**نص غامق** و *نص مائل*"></textarea>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-primary" onclick="saveArticle()">💾 حفظ</button>
+                <button class="btn btn-success" onclick="publishArticle()">🚀 نشر</button>
+                <button class="btn btn-outline" onclick="togglePreview()">👁️ معاينة</button>
+                <button class="btn btn-secondary" onclick="improveWithAI()">✨ تحسين بالذكاء الاصطناعي</button>
+            </div>
+
+            <div id="preview-container" style="display:none;margin-top:1.5rem;">
+                <h3 style="margin-bottom:1rem;">👁️ معاينة المقال</h3>
+                <div class="preview-panel" id="preview-panel"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="ai-section">
+                <h3>🤖 توليد مقال بالذكاء الاصطناعي</h3>
+                <div class="form-group">
+                    <label for="ai-topic">الموضوع</label>
+                    <input type="text" id="ai-topic" placeholder="مثال: عالم الثراء وأتمتة الأعمال">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ai-language">اللغة</label>
+                        <select id="ai-language">
+                            <option value="ar">العربية</option>
+                            <option value="en">الإنجليزية</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ai-words">عدد الكلمات المستهدف</label>
+                        <input type="number" id="ai-words" value="800" min="100" max="5000">
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="generateWithAI()">🤖 توليد مقال جديد</button>
+                <div class="ai-result" id="ai-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/blog-api.js"></script>
+    <script src="../js/blog-renderer.js"></script>
+    <script src="../js/blog-editor.js"></script>
+</body>
+</html>
