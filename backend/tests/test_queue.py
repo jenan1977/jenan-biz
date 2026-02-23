@@ -160,8 +160,11 @@ class TestMarkFailed:
         refreshed = db.get(Job, claimed.id)
         # Still below max → back to PENDING with run_after in the future
         assert refreshed.status == JobStatus.PENDING
-        # Compare naive datetimes (SQLite strips tz info)
-        assert refreshed.run_after > datetime.utcnow()
+        # Normalize to naive UTC for comparison (SQLite strips tz info)
+        run_after = refreshed.run_after
+        if run_after.tzinfo is not None:
+            run_after = run_after.replace(tzinfo=None)
+        assert run_after > datetime.now(timezone.utc).replace(tzinfo=None)
         assert refreshed.error == "transient error"
 
     def test_mark_failed_permanently_when_max_attempts_reached(self, db):
@@ -189,7 +192,7 @@ class TestMarkFailed:
             job.run_after = datetime.now(timezone.utc)
             db.flush()
 
-            before = datetime.utcnow()
+            before = datetime.now(timezone.utc).replace(tzinfo=None)
             claimed = dequeue(db)
             assert claimed is not None
             mark_failed(db, claimed, "err", base_delay_seconds=10)

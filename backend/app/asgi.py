@@ -67,7 +67,7 @@ except Exception as exc:  # pragma: no cover
 # Static file mounts
 # ---------------------------------------------------------------------------
 # Resolve paths relative to the repository root (two levels above backend/app)
-_repo_root = Path(__file__).resolve().parents[3]
+_repo_root = Path(__file__).resolve().parents[2]
 
 _webroot = _repo_root / "webroot"
 _assets = _repo_root / "assets"

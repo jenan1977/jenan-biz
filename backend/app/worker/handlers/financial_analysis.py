@@ -4,6 +4,8 @@ financial_analysis.py - Handler: aggregate sales/purchases and flag low stock.
 
 from __future__ import annotations
 
+import uuid
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Dict, List
 
@@ -33,20 +35,34 @@ def run(db: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
     - low_stock_alerts   : list[dict]
     - top_customers      : list[dict]  (top 10 by total spend)
     """
-    from datetime import datetime, timezone
-
     date_from_str: str | None = payload.get("date_from")
     date_to_str: str | None = payload.get("date_to")
     company_id_str: str | None = payload.get("company_id")
 
-    date_from = datetime.fromisoformat(date_from_str).replace(tzinfo=timezone.utc) if date_from_str else None
-    date_to = datetime.fromisoformat(date_to_str).replace(tzinfo=timezone.utc) if date_to_str else None
+    try:
+        date_from = (
+            datetime.fromisoformat(date_from_str).replace(tzinfo=timezone.utc)
+            if date_from_str
+            else None
+        )
+    except ValueError:
+        raise ValueError(f"Invalid date_from value: {date_from_str!r}")
+
+    try:
+        date_to = (
+            datetime.fromisoformat(date_to_str).replace(tzinfo=timezone.utc)
+            if date_to_str
+            else None
+        )
+    except ValueError:
+        raise ValueError(f"Invalid date_to value: {date_to_str!r}")
+
+    company_uuid = uuid.UUID(company_id_str) if company_id_str else None
 
     # ── Sales totals ──────────────────────────────────────────────────
     sales_q = db.query(func.coalesce(func.sum(SalesInvoice.total_amount), Decimal("0")))
-    if company_id_str:
-        import uuid
-        sales_q = sales_q.filter(SalesInvoice.company_id == uuid.UUID(company_id_str))
+    if company_uuid:
+        sales_q = sales_q.filter(SalesInvoice.company_id == company_uuid)
     if date_from:
         sales_q = sales_q.filter(SalesInvoice.invoice_date >= date_from)
     if date_to:
@@ -55,9 +71,8 @@ def run(db: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # ── Purchase totals ───────────────────────────────────────────────
     purch_q = db.query(func.coalesce(func.sum(PurchaseInvoice.total_amount), Decimal("0")))
-    if company_id_str:
-        import uuid
-        purch_q = purch_q.filter(PurchaseInvoice.company_id == uuid.UUID(company_id_str))
+    if company_uuid:
+        purch_q = purch_q.filter(PurchaseInvoice.company_id == company_uuid)
     if date_from:
         purch_q = purch_q.filter(PurchaseInvoice.invoice_date >= date_from)
     if date_to:
@@ -69,9 +84,8 @@ def run(db: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
         Inventory.reorder_level.isnot(None),
         Inventory.quantity_available <= Inventory.reorder_level,
     )
-    if company_id_str:
-        import uuid
-        inv_q = inv_q.filter(Inventory.company_id == uuid.UUID(company_id_str))
+    if company_uuid:
+        inv_q = inv_q.filter(Inventory.company_id == company_uuid)
 
     low_stock_alerts: List[Dict[str, Any]] = []
     for inv in inv_q.all():
@@ -94,9 +108,8 @@ def run(db: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
         .order_by(func.sum(SalesInvoice.total_amount).desc())
         .limit(10)
     )
-    if company_id_str:
-        import uuid
-        top_q = top_q.filter(SalesInvoice.company_id == uuid.UUID(company_id_str))
+    if company_uuid:
+        top_q = top_q.filter(SalesInvoice.company_id == company_uuid)
     if date_from:
         top_q = top_q.filter(SalesInvoice.invoice_date >= date_from)
     if date_to:
