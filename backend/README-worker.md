@@ -172,6 +172,53 @@ Back-off delay formula: `base_delay_seconds × 2^(attempts-1)` (default base: 60
 
 ---
 
+## CI – Database Initialisation Check
+
+The workflow at `.github/workflows/ci-db-jobs.yml` runs on every push to `main` and on
+every pull request. It:
+
+1. Spins up a PostgreSQL 15 service container.
+2. Installs `backend/requirements.txt` and `backend/requirements-ci.txt` (pytest).
+3. Calls `init_db()` to create all ORM-defined tables:
+   ```
+   PYTHONPATH=backend python -c "from app.core.database import init_db; init_db()"
+   ```
+4. Asserts that the `jobs` table was created (via SQLAlchemy `inspect`); the workflow
+   fails if the table is absent.
+5. Runs the test suite with:
+   ```
+   PYTHONPATH=backend pytest backend/tests -v
+   ```
+   The existing tests use an in-memory SQLite database, so no live PostgreSQL is needed
+   for them.
+
+### Run the same checks locally
+
+```bash
+# 1. Start a local PostgreSQL instance (adjust credentials as needed)
+export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/jenan_biz
+
+# 2. Install all dependencies (including pytest)
+pip install -r backend/requirements.txt -r backend/requirements-ci.txt
+
+# 3. Initialise the database
+PYTHONPATH=backend python -c "from app.core.database import init_db; init_db()"
+
+# 4. Verify the jobs table
+PYTHONPATH=backend python -c "
+from sqlalchemy import inspect
+from app.core.database import get_engine
+tables = inspect(get_engine()).get_table_names()
+assert 'jobs' in tables, f'jobs table not found – got: {tables}'
+print('OK –', tables)
+"
+
+# 5. Run tests (uses SQLite in-memory – no PostgreSQL required)
+PYTHONPATH=backend pytest backend/tests -v
+```
+
+---
+
 ## Follow-up
 
 - Replace the JWT auth stub in `app/api/routers/agents.py` once the JWT deps PR (`app.api.deps`) is merged.

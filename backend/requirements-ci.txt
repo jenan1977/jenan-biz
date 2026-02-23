@@ -1,0 +1,4 @@
+# CI-only dependencies (not required at runtime)
+# Install in addition to requirements.txt:
+#   pip install -r backend/requirements.txt -r backend/requirements-ci.txt
+pytest==8.3.5
