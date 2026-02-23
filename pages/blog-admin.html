@@ -44,10 +44,10 @@
 
         <!-- Tabs -->
         <div class="admin-tabs">
-            <button class="tab-btn active" onclick="switchTab('articles')">المقالات</button>
-            <button class="tab-btn" onclick="switchTab('categories')">الفئات</button>
-            <button class="tab-btn" onclick="switchTab('tags')">الوسوم</button>
-            <button class="tab-btn" onclick="switchTab('comments')">التعليقات</button>
+            <button class="tab-btn active" onclick="switchTab('articles', this)">المقالات</button>
+            <button class="tab-btn" onclick="switchTab('categories', this)">الفئات</button>
+            <button class="tab-btn" onclick="switchTab('tags', this)">الوسوم</button>
+            <button class="tab-btn" onclick="switchTab('comments', this)">التعليقات</button>
         </div>
 
         <!-- Articles Tab -->
@@ -124,11 +124,11 @@
     <script>
         let adminPage = 1;
 
-        function switchTab(tab) {
+        function switchTab(tab, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tab).style.display = 'block';
-            event.target.classList.add('active');
+            if (btn) btn.classList.add('active');
             if (tab === 'categories') loadCategoriesAdmin();
             if (tab === 'tags') loadTagsAdmin();
         }

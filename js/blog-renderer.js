@@ -156,7 +156,7 @@ async function loadArticleDetail(slug) {
         </div>
       </header>
       <div class="article-body">
-        <p>${renderMarkdown(article.content)}</p>
+        ${renderMarkdown(article.content)}
       </div>`;
 
     // Tags sidebar
