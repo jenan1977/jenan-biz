@@ -64,6 +64,17 @@ except Exception as exc:  # pragma: no cover
     logger.warning("Agents router not available: %s", exc)
 
 # ---------------------------------------------------------------------------
+# Blog router
+# ---------------------------------------------------------------------------
+try:
+    from app.blog.routes import router as blog_router
+
+    app.include_router(blog_router)
+    logger.info("Blog router registered at /api/v1/blog")
+except Exception as exc:  # pragma: no cover
+    logger.warning("Blog router not available: %s", exc)
+
+# ---------------------------------------------------------------------------
 # Static file mounts
 # ---------------------------------------------------------------------------
 # Resolve paths relative to the repository root (two levels above backend/app)

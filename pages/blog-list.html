@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جنان بيز - قائمة المقالات</title>
+    <link rel="stylesheet" href="../blog/assets/blog.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8f9fa; color: #333; }
+        .page-header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; padding: 2rem; text-align: center; }
+        .page-header h1 { margin: 0 0 .5rem; font-size: 2rem; }
+        .page-header p { margin: 0; opacity: .8; }
+        .toolbar { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; padding: 1.5rem 2rem; background: #fff; border-bottom: 1px solid #ddd; }
+        .toolbar input { flex: 1; min-width: 200px; padding: .6rem 1rem; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem; }
+        .toolbar select { padding: .6rem 1rem; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem; }
+        .toolbar .write-btn { padding: .6rem 1.4rem; background: #e94560; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: .95rem; text-decoration: none; }
+        .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem; }
+        .article-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .2s; }
+        .article-card:hover { transform: translateY(-4px); }
+        .card-cover { width: 100%; height: 180px; object-fit: cover; background: #e0e7ff; }
+        .card-cover-placeholder { width: 100%; height: 180px; background: linear-gradient(135deg,#e0e7ff,#c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+        .card-body { padding: 1.2rem; }
+        .card-meta { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; font-size: .8rem; }
+        .badge { padding: .2rem .6rem; border-radius: 12px; background: #e0e7ff; color: #4338ca; }
+        .badge.status-published { background: #d1fae5; color: #065f46; }
+        .badge.status-draft { background: #fef3c7; color: #92400e; }
+        .card-title { margin: 0 0 .5rem; font-size: 1.1rem; }
+        .card-title a { text-decoration: none; color: inherit; }
+        .card-title a:hover { color: #e94560; }
+        .card-summary { font-size: .9rem; color: #666; margin: 0 0 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-footer { display: flex; justify-content: space-between; font-size: .8rem; color: #999; border-top: 1px solid #f0f0f0; padding-top: .8rem; }
+        .pagination { display: flex; justify-content: center; gap: .5rem; padding: 2rem; }
+        .pagination button { padding: .5rem 1rem; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; }
+        .pagination button.active { background: #e94560; color: #fff; border-color: #e94560; }
+        .pagination button:hover:not(.active) { background: #f0f0f0; }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: #999; }
+        .loading { text-align: center; padding: 3rem; font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1>📚 مقالات جنان بيز</h1>
+        <p>اكتشف أحدث المقالات في عالم الأعمال والمال والريادة</p>
+    </header>
+
+    <div class="toolbar">
+        <input type="text" id="search-input" placeholder="🔍 ابحث عن مقال...">
+        <select id="status-filter">
+            <option value="">جميع الحالات</option>
+            <option value="published">منشور</option>
+            <option value="draft">مسودة</option>
+        </select>
+        <a href="write-article.html" class="write-btn">✍️ كتابة مقال</a>
+    </div>
+
+    <div id="loading" class="loading">⏳ جاري التحميل...</div>
+    <div id="articles-grid" class="articles-grid" style="display:none;"></div>
+    <div id="empty-state" class="empty-state" style="display:none;">
+        <p>🔍 لا توجد مقالات مطابقة لبحثك.</p>
+    </div>
+    <div id="pagination" class="pagination"></div>
+
+    <script src="../js/blog-api.js"></script>
+    <script src="../js/blog-renderer.js"></script>
+    <script>
+        let currentPage = 1;
+        const pageSize = 12;
+        let searchTimeout;
+
+        async function loadArticles(page = 1) {
+            const search = document.getElementById('search-input').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('articles-grid').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'none';
+
+            try {
+                const data = await BlogAPI.listArticles({ search, status: statusFilter, page, pageSize });
+                renderArticles(data);
+                renderPagination(data.total, page, pageSize);
+            } catch (e) {
+                document.getElementById('loading').textContent = '❌ تعذّر تحميل المقالات. تأكد من تشغيل الخادم.';
+            }
+        }
+
+        function renderArticles(data) {
+            const grid = document.getElementById('articles-grid');
+            document.getElementById('loading').style.display = 'none';
+
+            if (!data.items || data.items.length === 0) {
+                document.getElementById('empty-state').style.display = 'block';
+                return;
+            }
+
+            grid.innerHTML = data.items.map(article => BlogRenderer.articleCard(article)).join('');
+            grid.style.display = 'grid';
+        }
+
+        function renderPagination(total, page, pageSize) {
+            const totalPages = Math.ceil(total / pageSize);
+            if (totalPages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="${i === page ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            document.getElementById('pagination').innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadArticles(page);
+        }
+
+        document.getElementById('search-input').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => { currentPage = 1; loadArticles(1); }, 400);
+        });
+        document.getElementById('status-filter').addEventListener('change', () => { currentPage = 1; loadArticles(1); });
+
+        loadArticles(1);
+    </script>
+</body>
+</html>

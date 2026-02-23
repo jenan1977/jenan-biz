@@ -15,6 +15,16 @@ from app.models.purchase_line_item import PurchaseLineItem
 from app.models.inventory import Inventory
 from app.models.job import Job
 
+# Blog module models
+from app.blog.models import (  # noqa: F401
+    Article,
+    ArticleCategory,
+    ArticleComment,
+    ArticleRating,
+    ArticleTag,
+    article_tag_map,
+)
+
 __all__ = [
     "Base",
     "Company",
@@ -28,4 +38,11 @@ __all__ = [
     "PurchaseLineItem",
     "Inventory",
     "Job",
+    # Blog
+    "Article",
+    "ArticleCategory",
+    "ArticleComment",
+    "ArticleRating",
+    "ArticleTag",
+    "article_tag_map",
 ]
