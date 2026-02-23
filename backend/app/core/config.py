@@ -73,6 +73,11 @@ class Settings:
         if self.DATABASE_MAX_OVERFLOW < 0:
             raise ValueError("DATABASE_MAX_OVERFLOW must be non-negative.")
         if self.SECRET_KEY == "change-me-in-production":
+            if not self.DEBUG:
+                raise ValueError(
+                    "SECRET_KEY must be changed from the default value in production. "
+                    "Set a strong SECRET_KEY environment variable."
+                )
             _logger.warning(
                 "SECRET_KEY is set to the default insecure value. "
                 "Set a strong SECRET_KEY environment variable before deploying to production."

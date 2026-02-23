@@ -13,15 +13,10 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
+from jose import JWTError, jwt
+
 from app.core.config import settings
 from app.core.constants import UserRole
-from app.core.database import get_db
-
-try:
-    from jose import JWTError, jwt
-except ImportError:  # pragma: no cover
-    jwt = None  # type: ignore[assignment]
-    JWTError = Exception  # type: ignore[assignment, misc]
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
 
@@ -46,8 +41,6 @@ def _decode_token(token: str) -> TokenData:
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    if jwt is None:
-        raise credentials_exc
     try:
         payload = jwt.decode(
             token,
