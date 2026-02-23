@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>استوديو التصميم - جنان بيز</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #f0f2fa;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2c003e 0%, #6a0572 60%, #9c27b0 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+    }
+    header h1 { font-size: 1.6rem; }
+    header p  { font-size: .9rem; opacity: .8; }
+
+    .container { max-width: 860px; margin: 2rem auto; padding: 0 1rem; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 {
+      font-size: 1.2rem;
+      color: #6a0572;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #9c27b0;
+      padding-bottom: .5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+    }
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label { font-size: .85rem; font-weight: 600; color: #444; }
+
+    input[type="text"],
+    textarea,
+    select {
+      border: 1.5px solid #d1d9e6;
+      border-radius: 8px;
+      padding: .55rem .75rem;
+      font-size: .95rem;
+      font-family: inherit;
+      background: #fafbff;
+      transition: border-color .2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #9c27b0;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+
+    .priority-wrapper { display: flex; align-items: center; gap: .8rem; }
+    input[type="range"] { flex: 1; accent-color: #9c27b0; }
+    .priority-badge {
+      background: #6a0572; color: #fff;
+      border-radius: 20px; padding: .2rem .7rem;
+      font-size: .85rem; min-width: 2.5rem; text-align: center;
+    }
+
+    .btn-submit {
+      display: block; width: 100%; padding: .9rem;
+      background: linear-gradient(135deg, #9c27b0, #6a0572);
+      color: #fff; border: none; border-radius: 10px;
+      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      transition: opacity .2s; margin-top: 1rem;
+    }
+    .btn-submit:hover:not(:disabled) { opacity: .88; }
+    .btn-submit:disabled { opacity: .55; cursor: not-allowed; }
+
+    .progress-wrapper { display: none; }
+    .progress-wrapper.visible { display: block; }
+    .progress-track { height: 10px; background: #e0e4ef; border-radius: 99px; overflow: hidden; margin: .5rem 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,#9c27b0,#6a0572); border-radius: 99px; width: 0; transition: width .4s ease; }
+    .progress-label { font-size: .85rem; color: #666; text-align: center; }
+
+    #results { display: none; }
+    #results.visible { display: block; }
+    .result-content { white-space: pre-wrap; line-height: 1.8; font-size: .95rem; color: #222; }
+
+    .btn-download {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .6rem 1.2rem; background: #6a0572; color: #fff;
+      border: none; border-radius: 8px; font-size: .9rem; cursor: pointer;
+      margin-top: 1rem; transition: opacity .2s;
+    }
+    .btn-download:hover { opacity: .85; }
+
+    .alert-error {
+      background: #fff0f9; border: 1.5px solid #9c27b0;
+      border-radius: 8px; color: #6a0572;
+      padding: .8rem 1rem; font-size: .9rem; display: none;
+    }
+    .alert-error.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎨 استوديو التصميم الذكي</h1>
+  <p>توجيهات هوية بصرية احترافية بالذكاء الاصطناعي — جنان بيز</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>بيانات التصميم</h2>
+    <form id="designForm" novalidate>
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label for="designBrief">موجز التصميم *</label>
+          <textarea id="designBrief" name="designBrief" placeholder="اشرح ما تحتاجه من الهوية البصرية بالتفصيل…" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="brandName">اسم العلامة التجارية</label>
+          <input type="text" id="brandName" name="brandName" placeholder="مثال: جنان بيز" />
+        </div>
+
+        <div class="form-group">
+          <label for="industry">القطاع</label>
+          <select id="industry" name="industry">
+            <option value="">اختر القطاع…</option>
+            <option>تقنية</option>
+            <option>غذاء ومشروبات</option>
+            <option>أزياء وموضة</option>
+            <option>صحة وعافية</option>
+            <option>تعليم</option>
+            <option>عقارات</option>
+            <option>مالية واستثمار</option>
+            <option>ترفيه وإعلام</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="targetAudience">الجمهور المستهدف</label>
+          <input type="text" id="targetAudience" name="targetAudience" placeholder="مثال: سيدات 25-40" />
+        </div>
+
+        <div class="form-group">
+          <label for="style">الأسلوب المفضل</label>
+          <select id="style" name="style">
+            <option value="">اختر الأسلوب…</option>
+            <option>عصري وبسيط (Minimalist)</option>
+            <option>جريء وملفت (Bold)</option>
+            <option>أنيق وراقي (Luxury)</option>
+            <option>ودود وشبابي (Friendly)</option>
+            <option>تقني واحترافي (Tech)</option>
+            <option>تراثي وأصيل (Heritage)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="colorPreferences">تفضيلات الألوان</label>
+          <input type="text" id="colorPreferences" name="colorPreferences" placeholder="مثال: أزرق وذهبي، أو ألوان هادئة" />
+        </div>
+
+        <div class="form-group full">
+          <label for="values">قيم العلامة التجارية</label>
+          <textarea id="values" name="values" placeholder="ما الرسالة والقيم التي تريد إيصالها؟"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label for="competitors">المنافسون (للإلهام أو التمييز)</label>
+          <input type="text" id="competitors" name="competitors" placeholder="أسماء علامات تجارية منافسة أو ملهمة" />
+        </div>
+
+        <div class="form-group full">
+          <label for="priority">أولوية الطلب (1-10)</label>
+          <div class="priority-wrapper">
+            <input type="range" id="priority" name="priority" min="1" max="10" value="5"
+                   oninput="document.getElementById('priorityVal').textContent = this.value" />
+            <span class="priority-badge" id="priorityVal">5</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="alert-error" id="formError"></div>
+      <button type="submit" class="btn-submit" id="submitBtn">🎨 ابدأ التصميم</button>
+    </form>
+  </div>
+
+  <div class="card progress-wrapper" id="progressCard">
+    <h2>⏳ جاري الإبداع…</h2>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <p class="progress-label" id="progressLabel">يتم تحليل متطلبات التصميم…</p>
+  </div>
+
+  <div class="card" id="results">
+    <h2>🖌️ توجيهات التصميم</h2>
+    <pre class="result-content" id="resultContent"></pre>
+    <button class="btn-download" onclick="downloadReport()">⬇️ تحميل التوجيهات (TXT)</button>
+  </div>
+
+</div>
+
+<script>
+  const form      = document.getElementById('designForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const errBox    = document.getElementById('formError');
+  const progCard  = document.getElementById('progressCard');
+  const progFill  = document.getElementById('progressFill');
+  const progLabel = document.getElementById('progressLabel');
+  const results   = document.getElementById('results');
+  const resultContent = document.getElementById('resultContent');
+  let reportText = '';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const designBrief = form.designBrief.value.trim();
+    if (!designBrief) return showError('موجز التصميم مطلوب.');
+
+    const body = {
+      designBrief,
+      brandName:        form.brandName.value.trim()       || undefined,
+      industry:         form.industry.value               || undefined,
+      targetAudience:   form.targetAudience.value.trim()  || undefined,
+      style:            form.style.value                  || undefined,
+      colorPreferences: form.colorPreferences.value.trim()|| undefined,
+      values:           form.values.value.trim()          || undefined,
+      competitors:      form.competitors.value.trim()     || undefined,
+      priority:         parseInt(form.priority.value),
+    };
+    Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+
+    startProgress();
+    try {
+      const res  = await fetch('/api/design', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      finishProgress(!res.ok);
+      if (!res.ok || !data.success) throw new Error(data.error?.message || 'حدث خطأ.');
+      showResult(data.result);
+    } catch (err) {
+      finishProgress(true);
+      showError(err.message);
+    }
+  });
+
+  function startProgress() {
+    submitBtn.disabled = true;
+    results.classList.remove('visible');
+    progCard.classList.add('visible');
+    progFill.style.width = '10%';
+    let w = 10;
+    window._pi = setInterval(() => {
+      if (w < 85) { w += Math.random()*4; progFill.style.width = w+'%'; }
+    }, 600);
+  }
+  function finishProgress(error=false) {
+    clearInterval(window._pi);
+    progFill.style.width = '100%';
+    progFill.style.background = error ? '#e94560' : 'linear-gradient(90deg,#27ae60,#6a0572)';
+    setTimeout(() => progCard.classList.remove('visible'), 1500);
+    submitBtn.disabled = false;
+  }
+  function showResult(text) {
+    reportText = text;
+    resultContent.textContent = text;
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior:'smooth' });
+  }
+  function downloadReport() {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([reportText], {type:'text/plain;charset=utf-8'}));
+    a.download = 'design-guidelines.txt';
+    a.click();
+  }
+  function showError(msg) { errBox.textContent = '⚠️ '+msg; errBox.classList.add('visible'); }
+  function clearError()   { errBox.textContent = ''; errBox.classList.remove('visible'); }
+</script>
+
+</body>
+</html>

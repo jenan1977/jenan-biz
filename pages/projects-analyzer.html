@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>محلل المشاريع - جنان بيز</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #f4f6fb;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header h1 { font-size: 1.6rem; }
+    header p  { font-size: 0.9rem; opacity: 0.8; }
+
+    /* ── Layout ── */
+    .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 {
+      font-size: 1.2rem;
+      color: #0f3460;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e94560;
+      padding-bottom: .5rem;
+    }
+
+    /* ── Form grid ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label { font-size: .85rem; font-weight: 600; color: #444; }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      border: 1.5px solid #d1d9e6;
+      border-radius: 8px;
+      padding: .55rem .75rem;
+      font-size: .95rem;
+      font-family: inherit;
+      transition: border-color .2s;
+      background: #fafbff;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #0f3460;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+
+    /* ── Priority slider ── */
+    .priority-wrapper {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+    input[type="range"] { flex: 1; accent-color: #e94560; }
+    .priority-badge {
+      background: #0f3460;
+      color: #fff;
+      border-radius: 20px;
+      padding: .2rem .7rem;
+      font-size: .85rem;
+      min-width: 2.5rem;
+      text-align: center;
+    }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      display: block;
+      width: 100%;
+      padding: .9rem;
+      background: linear-gradient(135deg, #e94560, #c73652);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s;
+      margin-top: 1rem;
+    }
+    .btn-submit:hover:not(:disabled) { opacity: .88; }
+    .btn-submit:disabled { opacity: .55; cursor: not-allowed; }
+
+    /* ── Progress bar ── */
+    .progress-wrapper { display: none; }
+    .progress-wrapper.visible { display: block; }
+    .progress-track {
+      height: 10px;
+      background: #e0e4ef;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: .5rem 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e94560, #0f3460);
+      border-radius: 99px;
+      width: 0;
+      transition: width .4s ease;
+    }
+    .progress-label { font-size: .85rem; color: #666; text-align: center; }
+
+    /* ── Results ── */
+    #results { display: none; }
+    #results.visible { display: block; }
+
+    .result-content {
+      white-space: pre-wrap;
+      line-height: 1.8;
+      font-size: .95rem;
+      color: #222;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .6rem 1.2rem;
+      background: #0f3460;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: .9rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn-download:hover { opacity: .85; }
+
+    /* ── Error ── */
+    .alert-error {
+      background: #fff0f3;
+      border: 1.5px solid #e94560;
+      border-radius: 8px;
+      color: #c73652;
+      padding: .8rem 1rem;
+      font-size: .9rem;
+      display: none;
+    }
+    .alert-error.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🔍 محلل المشاريع الذكي</h1>
+    <p>تحليل شامل لمشروعك بالذكاء الاصطناعي — جنان بيز</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Form card -->
+  <div class="card">
+    <h2>بيانات المشروع</h2>
+    <form id="analyzerForm" novalidate>
+      <div class="form-grid">
+
+        <!-- Required fields -->
+        <div class="form-group">
+          <label for="projectName">اسم المشروع *</label>
+          <input type="text" id="projectName" name="projectName" placeholder="مثال: متجر إلكتروني للمنتجات العضوية" required />
+        </div>
+
+        <div class="form-group">
+          <label for="industry">القطاع / الصناعة</label>
+          <select id="industry" name="industry">
+            <option value="">اختر القطاع…</option>
+            <option>تجارة إلكترونية</option>
+            <option>تقنية المعلومات</option>
+            <option>الغذاء والمشروبات</option>
+            <option>الصحة والرعاية</option>
+            <option>التعليم والتدريب</option>
+            <option>العقارات</option>
+            <option>السياحة والضيافة</option>
+            <option>التصنيع</option>
+            <option>الاستشارات</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label for="projectDescription">وصف المشروع *</label>
+          <textarea id="projectDescription" name="projectDescription" placeholder="اشرح فكرة مشروعك بالتفصيل…" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="targetMarket">السوق المستهدف</label>
+          <input type="text" id="targetMarket" name="targetMarket" placeholder="مثال: شباب 18-35 في السعودية" />
+        </div>
+
+        <div class="form-group">
+          <label for="budget">الميزانية المتاحة</label>
+          <input type="text" id="budget" name="budget" placeholder="مثال: 100,000 ريال" />
+        </div>
+
+        <div class="form-group">
+          <label for="timeline">الجدول الزمني</label>
+          <input type="text" id="timeline" name="timeline" placeholder="مثال: 6 أشهر" />
+        </div>
+
+        <div class="form-group">
+          <label for="teamSize">حجم الفريق</label>
+          <input type="number" id="teamSize" name="teamSize" placeholder="عدد الأعضاء" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label for="currentRevenue">الإيرادات الحالية (إن وجدت)</label>
+          <input type="text" id="currentRevenue" name="currentRevenue" placeholder="مثال: 20,000 ريال/شهر" />
+        </div>
+
+        <div class="form-group full">
+          <label for="goals">الأهداف الرئيسية</label>
+          <textarea id="goals" name="goals" placeholder="ما الذي تريد تحقيقه خلال السنة القادمة؟"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label for="challenges">التحديات الحالية</label>
+          <textarea id="challenges" name="challenges" placeholder="ما هي أبرز التحديات التي تواجهها؟"></textarea>
+        </div>
+
+        <!-- Priority -->
+        <div class="form-group full">
+          <label for="priority">أولوية الطلب (1 = عادي، 10 = عاجل جداً)</label>
+          <div class="priority-wrapper">
+            <input type="range" id="priority" name="priority" min="1" max="10" value="5"
+                   oninput="document.getElementById('priorityVal').textContent = this.value" />
+            <span class="priority-badge" id="priorityVal">5</span>
+          </div>
+        </div>
+
+      </div><!-- /.form-grid -->
+
+      <div class="alert-error" id="formError"></div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        🚀 ابدأ التحليل
+      </button>
+    </form>
+  </div><!-- /.card -->
+
+  <!-- Progress card -->
+  <div class="card progress-wrapper" id="progressCard">
+    <h2>⏳ جاري التحليل…</h2>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <p class="progress-label" id="progressLabel">يتم إرسال البيانات للذكاء الاصطناعي…</p>
+  </div>
+
+  <!-- Results card -->
+  <div class="card" id="results">
+    <h2>📊 نتائج التحليل</h2>
+    <pre class="result-content" id="resultContent"></pre>
+    <button class="btn-download" id="downloadBtn" onclick="downloadReport()">
+      ⬇️ تحميل التقرير (TXT)
+    </button>
+  </div>
+
+</div><!-- /.container -->
+
+<script>
+  const form      = document.getElementById('analyzerForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const errBox    = document.getElementById('formError');
+  const progCard  = document.getElementById('progressCard');
+  const progFill  = document.getElementById('progressFill');
+  const progLabel = document.getElementById('progressLabel');
+  const results   = document.getElementById('results');
+  const resultContent = document.getElementById('resultContent');
+
+  let reportText = '';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const projectName        = form.projectName.value.trim();
+    const projectDescription = form.projectDescription.value.trim();
+
+    if (!projectName) return showError('اسم المشروع مطلوب.');
+    if (!projectDescription) return showError('وصف المشروع مطلوب.');
+
+    const body = {
+      projectName,
+      projectDescription,
+      industry:       form.industry.value       || undefined,
+      targetMarket:   form.targetMarket.value.trim()   || undefined,
+      budget:         form.budget.value.trim()         || undefined,
+      timeline:       form.timeline.value.trim()       || undefined,
+      teamSize:       form.teamSize.value ? parseInt(form.teamSize.value) : undefined,
+      currentRevenue: form.currentRevenue.value.trim() || undefined,
+      goals:          form.goals.value.trim()          || undefined,
+      challenges:     form.challenges.value.trim()     || undefined,
+      priority:       parseInt(form.priority.value),
+    };
+
+    // Strip undefined keys
+    Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+
+    startProgress();
+
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      finishProgress();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error?.message || 'حدث خطأ غير متوقع.');
+      }
+
+      showResult(data.result);
+    } catch (err) {
+      finishProgress(true);
+      showError(err.message);
+    }
+  });
+
+  function startProgress() {
+    submitBtn.disabled = true;
+    results.classList.remove('visible');
+    progCard.classList.add('visible');
+    progFill.style.width = '10%';
+    progLabel.textContent = 'يتم إرسال البيانات للذكاء الاصطناعي…';
+    // Animate progress bar while waiting
+    let w = 10;
+    window._progInterval = setInterval(() => {
+      if (w < 85) {
+        w += Math.random() * 4;
+        progFill.style.width = w + '%';
+        if (w > 30) progLabel.textContent = 'الذكاء الاصطناعي يحلل مشروعك…';
+        if (w > 60) progLabel.textContent = 'يتم إعداد التقرير…';
+      }
+    }, 600);
+  }
+
+  function finishProgress(error = false) {
+    clearInterval(window._progInterval);
+    progFill.style.width = '100%';
+    progFill.style.background = error ? '#e94560' : 'linear-gradient(90deg,#27ae60,#0f3460)';
+    progLabel.textContent = error ? 'حدث خطأ أثناء التحليل.' : 'اكتمل التحليل!';
+    setTimeout(() => progCard.classList.remove('visible'), 1500);
+    submitBtn.disabled = false;
+  }
+
+  function showResult(text) {
+    reportText = text;
+    resultContent.textContent = text;
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function downloadReport() {
+    const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'project-analysis-report.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function showError(msg) {
+    errBox.textContent = '⚠️ ' + msg;
+    errBox.classList.add('visible');
+  }
+  function clearError() {
+    errBox.textContent = '';
+    errBox.classList.remove('visible');
+  }
+</script>
+
+</body>
+</html>

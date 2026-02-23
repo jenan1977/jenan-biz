@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الدورات اليومية - جنان بيز</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #f0f7ff;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #003366 0%, #0066cc 60%, #0099ff 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+    }
+    header h1 { font-size: 1.6rem; }
+    header p  { font-size: .9rem; opacity: .8; }
+
+    .container { max-width: 860px; margin: 2rem auto; padding: 0 1rem; }
+
+    .card {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      padding: 2rem; margin-bottom: 1.5rem;
+    }
+    .card h2 {
+      font-size: 1.2rem; color: #003366;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #0066cc; padding-bottom: .5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+    }
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label { font-size: .85rem; font-weight: 600; color: #444; }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      border: 1.5px solid #d1d9e6; border-radius: 8px;
+      padding: .55rem .75rem; font-size: .95rem;
+      font-family: inherit; background: #fafbff;
+      transition: border-color .2s;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #0066cc; }
+    textarea { min-height: 90px; resize: vertical; }
+
+    .priority-wrapper { display: flex; align-items: center; gap: .8rem; }
+    input[type="range"] { flex: 1; accent-color: #0066cc; }
+    .priority-badge {
+      background: #003366; color: #fff; border-radius: 20px;
+      padding: .2rem .7rem; font-size: .85rem; min-width: 2.5rem; text-align: center;
+    }
+
+    .btn-submit {
+      display: block; width: 100%; padding: .9rem;
+      background: linear-gradient(135deg, #0066cc, #003366);
+      color: #fff; border: none; border-radius: 10px;
+      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      transition: opacity .2s; margin-top: 1rem;
+    }
+    .btn-submit:hover:not(:disabled) { opacity: .88; }
+    .btn-submit:disabled { opacity: .55; cursor: not-allowed; }
+
+    .progress-wrapper { display: none; }
+    .progress-wrapper.visible { display: block; }
+    .progress-track { height: 10px; background: #e0e4ef; border-radius: 99px; overflow: hidden; margin: .5rem 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,#0066cc,#003366); border-radius: 99px; width: 0; transition: width .4s ease; }
+    .progress-label { font-size: .85rem; color: #666; text-align: center; }
+
+    #results { display: none; }
+    #results.visible { display: block; }
+    .result-content { white-space: pre-wrap; line-height: 1.8; font-size: .95rem; color: #222; }
+
+    .btn-download {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .6rem 1.2rem; background: #003366; color: #fff;
+      border: none; border-radius: 8px; font-size: .9rem; cursor: pointer;
+      margin-top: 1rem; transition: opacity .2s;
+    }
+    .btn-download:hover { opacity: .85; }
+
+    .alert-error {
+      background: #f0f4ff; border: 1.5px solid #0066cc;
+      border-radius: 8px; color: #003366;
+      padding: .8rem 1rem; font-size: .9rem; display: none;
+    }
+    .alert-error.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📚 الدورات التعليمية الذكية</h1>
+  <p>خطط تعلم مخصصة بالذكاء الاصطناعي — جنان بيز</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>بيانات خطة التعلم</h2>
+    <form id="coursesForm" novalidate>
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label for="topic">الموضوع / المهارة المطلوبة *</label>
+          <input type="text" id="topic" name="topic" placeholder="مثال: تعلم البرمجة بلغة Python من الصفر" required />
+        </div>
+
+        <div class="form-group">
+          <label for="level">مستواك الحالي</label>
+          <select id="level" name="level">
+            <option value="">اختر مستواك…</option>
+            <option>مبتدئ تماماً</option>
+            <option>مبتدئ مع معرفة أساسية</option>
+            <option>متوسط</option>
+            <option>متقدم</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="availableHoursPerDay">الوقت المتاح يومياً (ساعات)</label>
+          <input type="number" id="availableHoursPerDay" name="availableHoursPerDay" placeholder="مثال: 2" min="0.5" max="12" step="0.5" />
+        </div>
+
+        <div class="form-group">
+          <label for="durationWeeks">مدة التعلم المستهدفة (أسابيع)</label>
+          <input type="number" id="durationWeeks" name="durationWeeks" placeholder="مثال: 8" min="1" max="52" />
+        </div>
+
+        <div class="form-group">
+          <label for="preferredResources">المصادر المفضلة</label>
+          <select id="preferredResources" name="preferredResources">
+            <option value="">أي مصدر مناسب</option>
+            <option>فيديوهات يوتيوب</option>
+            <option>دورات أودمي / كورسيرا</option>
+            <option>كتب PDF</option>
+            <option>مقالات ومدونات</option>
+            <option>مشاريع عملية فقط</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label for="goals">الأهداف من التعلم</label>
+          <textarea id="goals" name="goals" placeholder="ماذا تريد أن تفعل بعد إتقان هذه المهارة؟"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label for="currentKnowledge">معرفتك الحالية بالموضوع</label>
+          <textarea id="currentKnowledge" name="currentKnowledge" placeholder="صف ما تعرفه حالياً…"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label for="priority">أولوية الطلب (1-10)</label>
+          <div class="priority-wrapper">
+            <input type="range" id="priority" name="priority" min="1" max="10" value="5"
+                   oninput="document.getElementById('priorityVal').textContent = this.value" />
+            <span class="priority-badge" id="priorityVal">5</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="alert-error" id="formError"></div>
+      <button type="submit" class="btn-submit" id="submitBtn">📚 إنشاء خطة التعلم</button>
+    </form>
+  </div>
+
+  <div class="card progress-wrapper" id="progressCard">
+    <h2>⏳ جاري إعداد خطتك…</h2>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <p class="progress-label" id="progressLabel">يتم تحليل احتياجاتك التعليمية…</p>
+  </div>
+
+  <div class="card" id="results">
+    <h2>🎯 خطة التعلم المخصصة</h2>
+    <pre class="result-content" id="resultContent"></pre>
+    <button class="btn-download" onclick="downloadReport()">⬇️ تحميل الخطة (TXT)</button>
+  </div>
+
+</div>
+
+<script>
+  const form      = document.getElementById('coursesForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const errBox    = document.getElementById('formError');
+  const progCard  = document.getElementById('progressCard');
+  const progFill  = document.getElementById('progressFill');
+  const results   = document.getElementById('results');
+  const resultContent = document.getElementById('resultContent');
+  let reportText = '';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const topic = form.topic.value.trim();
+    if (!topic) return showError('الموضوع المطلوب تعلمه مطلوب.');
+
+    const avail = form.availableHoursPerDay.value;
+    const dur   = form.durationWeeks.value;
+
+    const body = {
+      topic,
+      level:                  form.level.value                          || undefined,
+      availableHoursPerDay:   avail ? parseFloat(avail)                 : undefined,
+      durationWeeks:          dur   ? parseInt(dur)                     : undefined,
+      preferredResources:     form.preferredResources.value             || undefined,
+      goals:                  form.goals.value.trim()                   || undefined,
+      currentKnowledge:       form.currentKnowledge.value.trim()        || undefined,
+      priority:               parseInt(form.priority.value),
+    };
+    Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+
+    startProgress();
+    try {
+      const res  = await fetch('/api/courses', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      finishProgress(!res.ok);
+      if (!res.ok || !data.success) throw new Error(data.error?.message || 'حدث خطأ.');
+      showResult(data.result);
+    } catch (err) {
+      finishProgress(true);
+      showError(err.message);
+    }
+  });
+
+  function startProgress() {
+    submitBtn.disabled = true;
+    results.classList.remove('visible');
+    progCard.classList.add('visible');
+    progFill.style.width = '10%';
+    let w = 10;
+    window._pi = setInterval(() => {
+      if (w < 85) { w += Math.random()*4; progFill.style.width = w+'%'; }
+    }, 600);
+  }
+  function finishProgress(error=false) {
+    clearInterval(window._pi);
+    progFill.style.width = '100%';
+    progFill.style.background = error ? '#e94560' : 'linear-gradient(90deg,#27ae60,#003366)';
+    setTimeout(() => progCard.classList.remove('visible'), 1500);
+    submitBtn.disabled = false;
+  }
+  function showResult(text) {
+    reportText = text;
+    resultContent.textContent = text;
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior:'smooth' });
+  }
+  function downloadReport() {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([reportText], {type:'text/plain;charset=utf-8'}));
+    a.download = 'learning-plan.txt';
+    a.click();
+  }
+  function showError(msg) { errBox.textContent = '⚠️ '+msg; errBox.classList.add('visible'); }
+  function clearError()   { errBox.textContent = ''; errBox.classList.remove('visible'); }
+</script>
+
+</body>
+</html>
