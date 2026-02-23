@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">مقالة - جنان بيز</title>
+    <!-- SEO meta tags - updated dynamically -->
+    <meta name="description" id="meta-description" content="">
+    <meta property="og:title" id="og-title" content="">
+    <meta property="og:description" id="og-description" content="">
+    <meta property="og:type" content="article">
+    <link rel="stylesheet" href="../css/blog.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <!-- Schema.org Article markup -->
+    <script type="application/ld+json" id="schema-article"></script>
+</head>
+<body>
+    <header class="blog-header">
+        <div class="container header-content">
+            <a href="blog.html" class="logo-link"><h1>جنان بيز</h1></a>
+            <nav class="blog-nav">
+                <a href="blog-list.html">← المقالات</a>
+                <a href="blog.html">الرئيسية</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container article-main">
+        <div class="article-layout">
+            <!-- Main Article -->
+            <article class="article-content" id="article-container">
+                <div class="loading-spinner">جارٍ تحميل المقالة...</div>
+            </article>
+
+            <!-- Sidebar -->
+            <aside class="article-sidebar">
+                <div class="sidebar-card">
+                    <h4>الوسوم</h4>
+                    <div class="tags-container" id="article-tags"></div>
+                </div>
+                <div class="sidebar-card">
+                    <h4>شارك المقالة</h4>
+                    <div class="share-buttons">
+                        <button onclick="shareArticle('twitter')" class="share-btn share-twitter">Twitter / X</button>
+                        <button onclick="shareArticle('whatsapp')" class="share-btn share-whatsapp">WhatsApp</button>
+                        <button onclick="copyArticleLink()" class="share-btn share-copy">نسخ الرابط</button>
+                    </div>
+                </div>
+                <div class="sidebar-card">
+                    <h4>مقالات ذات صلة</h4>
+                    <div id="related-articles"></div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Comments Section -->
+        <section class="comments-section" id="comments-section">
+            <h3>التعليقات</h3>
+            <div id="comments-list"></div>
+            <div class="comment-form-container" id="comment-form-container"></div>
+        </section>
+    </main>
+
+    <footer class="blog-footer">
+        <div class="container">
+            <p>© 2026 جنان بيز - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <script src="../js/blog-api.js"></script>
+    <script src="../js/blog-renderer.js"></script>
+    <script src="../js/comments-widget.js"></script>
+    <script>
+        (async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug');
+            if (!slug) { window.location.href = 'blog-list.html'; return; }
+            await loadArticleDetail(slug);
+        })();
+    </script>
+</body>
+</html>

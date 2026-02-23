@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر المقالات - جنان بيز</title>
+    <link rel="stylesheet" href="../css/blog.css">
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+    <header class="blog-header">
+        <div class="container header-content">
+            <a href="blog.html" class="logo-link"><h1>جنان بيز</h1></a>
+            <div class="editor-actions">
+                <button onclick="saveDraft()" class="btn btn-secondary">حفظ مسودة</button>
+                <button onclick="publishArticle()" class="btn btn-primary">نشر المقالة</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="editor-main">
+        <div class="editor-layout">
+            <!-- Editor Panel -->
+            <div class="editor-panel">
+                <div class="editor-toolbar">
+                    <span class="toolbar-label">محرر المحتوى</span>
+                    <div class="toolbar-buttons">
+                        <button onclick="insertMd('**', '**')" title="Bold" class="toolbar-btn">B</button>
+                        <button onclick="insertMd('*', '*')" title="Italic" class="toolbar-btn"><em>I</em></button>
+                        <button onclick="insertMd('## ', '')" title="Heading" class="toolbar-btn">H</button>
+                        <button onclick="insertMd('- ', '')" title="List" class="toolbar-btn">☰</button>
+                        <button onclick="insertMd('[', '](url)')" title="Link" class="toolbar-btn">🔗</button>
+                        <button onclick="insertMd('\n```\n', '\n```')" title="Code" class="toolbar-btn">&lt;/&gt;</button>
+                        <button onclick="generateWithAI()" class="toolbar-btn btn-ai">✨ توليد بـ AI</button>
+                        <button onclick="improveWithAI()" class="toolbar-btn btn-ai">🔧 تحسين</button>
+                    </div>
+                </div>
+
+                <div class="editor-fields">
+                    <input type="hidden" id="article-id" value="">
+                    <div class="field-group">
+                        <label for="title">عنوان المقالة *</label>
+                        <input type="text" id="title" placeholder="أدخل عنوان المقالة..." required>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label for="category">الفئة</label>
+                            <select id="category">
+                                <option value="">-- اختر فئة --</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label for="status">الحالة</label>
+                            <select id="status">
+                                <option value="draft">مسودة</option>
+                                <option value="published">منشور</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label for="tags-input">الوسوم (مفصولة بفاصلة)</label>
+                        <input type="text" id="tags-input" placeholder="مثال: الاستثمار، الأعمال، المال">
+                    </div>
+                    <div class="field-group">
+                        <label for="excerpt">المقتطف</label>
+                        <textarea id="excerpt" rows="3" placeholder="وصف مختصر للمقالة..."></textarea>
+                    </div>
+                    <div class="field-group">
+                        <label for="content-editor">المحتوى (Markdown) *</label>
+                        <textarea id="content-editor" rows="20" placeholder="اكتب مقالتك هنا بتنسيق Markdown..."></textarea>
+                    </div>
+                    <div class="field-group">
+                        <label for="cover-image">رابط صورة الغلاف</label>
+                        <input type="url" id="cover-image" placeholder="https://...">
+                    </div>
+                    <div class="field-group">
+                        <label for="author">الكاتب</label>
+                        <input type="text" id="author" value="Jenan BIZ AI">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-toolbar">
+                    <span>معاينة</span>
+                    <button onclick="togglePreview()" class="toolbar-btn">↔ تبديل</button>
+                </div>
+                <div class="preview-content" id="preview-content">
+                    <p class="preview-placeholder">ابدأ الكتابة لترى المعاينة...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Generate Modal -->
+    <div class="modal" id="ai-modal" style="display:none">
+        <div class="modal-content">
+            <button onclick="closeAIModal()" class="modal-close">×</button>
+            <h3>توليد مقالة بالذكاء الاصطناعي</h3>
+            <div class="field-group">
+                <label for="ai-topic">موضوع المقالة *</label>
+                <input type="text" id="ai-topic" placeholder="مثال: كيفية بناء عمل تجاري ناجح">
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label for="ai-word-count">عدد الكلمات التقريبي</label>
+                    <select id="ai-word-count">
+                        <option value="800">800 كلمة</option>
+                        <option value="1500" selected>1500 كلمة</option>
+                        <option value="2500">2500 كلمة</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="runAIGenerate()" class="btn btn-primary">توليد ✨</button>
+        </div>
+    </div>
+
+    <script src="../js/blog-api.js"></script>
+    <script src="../js/blog-editor.js"></script>
+    <script>
+        (async function init() {
+            await loadCategoryOptions('category');
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (id) { await loadArticleForEdit(id); }
+            initEditor();
+        })();
+    </script>
+</body>
+</html>
