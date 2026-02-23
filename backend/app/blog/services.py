@@ -43,6 +43,14 @@ from app.blog.schemas import (
 _WORDS_PER_MINUTE = 200
 
 
+def _slugify(text: str) -> str:
+    """Convert a string to a URL-safe slug (mirrors the schema helper)."""
+    text = text.strip().lower()
+    text = re.sub(r"[^\w\s-]", "", text, flags=re.UNICODE)
+    text = re.sub(r"[\s_-]+", "-", text)
+    return text.strip("-")
+
+
 def _estimate_read_time(body: str) -> int:
     """Return estimated reading time in minutes (minimum 1)."""
     word_count = len(body.split())
@@ -68,7 +76,7 @@ def _unique_slug(db: Session, base_slug: str, model, exclude_id: Optional[uuid.U
 # ---------------------------------------------------------------------------
 
 def create_category(db: Session, data: CategoryCreate) -> ArticleCategory:
-    slug = _unique_slug(db, data.slug or data.name.lower(), ArticleCategory)
+    slug = _unique_slug(db, data.slug or _slugify(data.name), ArticleCategory)
     cat = ArticleCategory(name=data.name, slug=slug, description=data.description)
     db.add(cat)
     db.flush()
@@ -88,7 +96,7 @@ def get_category(db: Session, category_id: uuid.UUID) -> Optional[ArticleCategor
 # ---------------------------------------------------------------------------
 
 def create_tag(db: Session, data: TagCreate) -> ArticleTag:
-    slug = _unique_slug(db, data.slug or data.name.lower(), ArticleTag)
+    slug = _unique_slug(db, data.slug or _slugify(data.name), ArticleTag)
     tag = ArticleTag(name=data.name, slug=slug)
     db.add(tag)
     db.flush()
@@ -100,7 +108,7 @@ def list_tags(db: Session) -> List[ArticleTag]:
 
 
 def get_or_create_tag(db: Session, name: str) -> ArticleTag:
-    slug = re.sub(r"[\s_]+", "-", name.strip().lower())
+    slug = _slugify(name)
     tag = db.query(ArticleTag).filter(ArticleTag.slug == slug).first()
     if tag is None:
         tag = ArticleTag(name=name.strip(), slug=slug)
@@ -127,7 +135,7 @@ def _article_query(db: Session):
 
 
 def create_article(db: Session, data: ArticleCreate) -> Article:
-    slug = _unique_slug(db, data.slug or data.title.lower(), Article)
+    slug = _unique_slug(db, data.slug or _slugify(data.title), Article)
     now = datetime.now(timezone.utc)
     article = Article(
         title=data.title,

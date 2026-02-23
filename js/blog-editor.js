@@ -49,7 +49,15 @@ function addTagChip(name) {
     const container = document.getElementById('tag-input');
     const chip = document.createElement('span');
     chip.className = 'tag-chip';
-    chip.innerHTML = `${name} <button type="button" onclick="removeTag('${name}', this)">×</button>`;
+
+    const nameNode = document.createTextNode(name + ' ');
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => removeTag(name, removeBtn));
+
+    chip.appendChild(nameNode);
+    chip.appendChild(removeBtn);
     container.insertBefore(chip, document.getElementById('tag-text'));
 }
 

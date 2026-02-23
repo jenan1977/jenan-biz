@@ -109,7 +109,7 @@
     <script src="../js/blog-renderer.js"></script>
     <script>
         let articleId = null;
-        const sessionKey = 'sess_' + Math.random().toString(36).substr(2, 12);
+        const sessionKey = 'sess_' + Math.random().toString(36).slice(2, 14);
 
         async function loadArticle() {
             const params = new URLSearchParams(window.location.search);
@@ -172,14 +172,28 @@
             const comments = await BlogAPI.getComments(articleId);
             const list = document.getElementById('comments-list');
             if (!comments.length) { list.innerHTML = '<p style="color:#999">لا توجد تعليقات بعد.</p>'; return; }
-            list.innerHTML = comments.map(c => `
-                <div class="comment-card">
-                    <div class="comment-author">👤 ${c.author_name}</div>
-                    <div class="comment-body">${c.body}</div>
-                    <div style="font-size:.8rem;color:#aaa;margin-top:.3rem;">
-                        ${new Date(c.created_at).toLocaleDateString('ar')}
-                    </div>
-                </div>`).join('');
+            list.innerHTML = '';
+            comments.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'comment-card';
+
+                const author = document.createElement('div');
+                author.className = 'comment-author';
+                author.textContent = '👤 ' + c.author_name;
+
+                const body = document.createElement('div');
+                body.className = 'comment-body';
+                body.textContent = c.body;
+
+                const meta = document.createElement('div');
+                meta.style.cssText = 'font-size:.8rem;color:#aaa;margin-top:.3rem;';
+                meta.textContent = new Date(c.created_at).toLocaleDateString('ar');
+
+                card.appendChild(author);
+                card.appendChild(body);
+                card.appendChild(meta);
+                list.appendChild(card);
+            });
         }
 
         async function submitComment() {
