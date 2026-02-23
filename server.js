@@ -40,9 +40,9 @@ app.get('/health', (req, res) => {
   })
 })
 
-// Home page
+// Home page – delegate to the static-file middleware already mounted above
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/pages/projects-analyzer.html')
+  res.redirect('/projects-analyzer.html')
 })
 
 // 404
@@ -53,7 +53,8 @@ app.use((req, res) => {
 // Error handling
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.error(err)
-  res.status(500).json({ error: 'Internal server error' })
+  const message = config.env === 'development' ? err.message : 'Internal server error'
+  res.status(500).json({ error: message })
 })
 
 // Graceful shutdown

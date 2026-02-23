@@ -14,11 +14,13 @@
 const OpenAI = require('openai')
 const config = require('./config')
 
-// Initialise the SDK client once (singleton)
+// Initialise the SDK client once (singleton).
+// Set maxRetries to 0 so the queue system's exponential-backoff retry logic
+// (up to retryLimit attempts) is the single source of retry behaviour.
 const _client = new OpenAI({
   apiKey: config.openai.apiKey,
   timeout: config.openai.timeout,
-  maxRetries: 2  // built-in SDK retry for 429 / 5xx
+  maxRetries: 0
 })
 
 /**
