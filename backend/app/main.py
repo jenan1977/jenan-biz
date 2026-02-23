@@ -1,16 +1,19 @@
 """
 main.py - Application entry point.
 
-This module wires together the core components and provides a simple
-``startup()`` helper that can be called from a future ASGI framework
-(e.g. FastAPI lifespan) or from CLI tooling.
+This module wires together the core components and provides:
+- A FastAPI application instance (``app``) that mounts the agents router.
+- A ``startup()`` helper for CLI / testing.
 
-No HTTP routes or framework decorators are defined here; those will be
-added in a later step.
+Run the API server with:
+    uvicorn app.main:app --reload
 """
 
 import logging
 
+from fastapi import FastAPI
+
+from app.api.agents import router as agents_router
 from app.core.config import settings
 from app.core.database import check_db_connection, init_db
 
@@ -41,6 +44,20 @@ def startup() -> None:
     logger.info("Database connection verified.")
     init_db()
     logger.info("All tables created / verified.")
+
+
+def create_app() -> FastAPI:
+    """Create and configure the FastAPI application."""
+    application = FastAPI(
+        title=settings.APP_NAME,
+        debug=settings.DEBUG,
+    )
+    application.include_router(agents_router)
+    return application
+
+
+# ASGI app instance used by uvicorn / gunicorn
+app = create_app()
 
 
 if __name__ == "__main__":

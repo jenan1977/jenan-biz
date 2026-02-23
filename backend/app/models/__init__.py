@@ -13,6 +13,7 @@ from app.models.sales_line_item import SalesLineItem
 from app.models.purchase_invoice import PurchaseInvoice
 from app.models.purchase_line_item import PurchaseLineItem
 from app.models.inventory import Inventory
+from app.models.job import Job
 
 __all__ = [
     "Base",
@@ -26,4 +27,5 @@ __all__ = [
     "PurchaseInvoice",
     "PurchaseLineItem",
     "Inventory",
+    "Job",
 ]

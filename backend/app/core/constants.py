@@ -70,6 +70,24 @@ class StockStatus(str, enum.Enum):
     OUT_OF_STOCK = "out_of_stock"
 
 
+class JobType(str, enum.Enum):
+    """Background job type."""
+
+    FINANCIAL_ANALYSIS = "FINANCIAL_ANALYSIS"
+    PDF_REPORT = "PDF_REPORT"
+    BULK_INVENTORY_UPDATE = "BULK_INVENTORY_UPDATE"
+
+
+class JobStatus(str, enum.Enum):
+    """Background job lifecycle status."""
+
+    QUEUED = "QUEUED"
+    RUNNING = "RUNNING"
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
+
 # Tax rate applied to invoices (15%)
 TAX_RATE: float = 0.15
 
