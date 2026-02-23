@@ -47,6 +47,28 @@ class Settings:
     APP_NAME: str = os.getenv("APP_NAME", "Jenan-Biz")
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
 
+    # ------------------------------------------------------------------
+    # JWT / Security
+    # ------------------------------------------------------------------
+    SECRET_KEY: str = os.getenv(
+        "SECRET_KEY",
+        "changeme-secret-key-for-development-only-do-not-use-in-production",
+    )
+    """JWT signing secret – override with a long random value in production."""
+
+    ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
+    """JWT signing algorithm."""
+
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
+        os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
+    )
+    """Lifetime of an access token in minutes."""
+
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(
+        os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7")
+    )
+    """Lifetime of a refresh token in days."""
+
     def validate(self) -> None:
         """Raise ValueError if any required setting is missing or invalid."""
         if not self.DATABASE_URL:
