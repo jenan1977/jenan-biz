@@ -1,0 +1,41 @@
+"""
+schemas/auth.py - Authentication request/response schemas.
+"""
+
+from pydantic import BaseModel, EmailStr
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    full_name: str | None = None
+    role: str = "operator"
+    company_id: str | None = None
+
+
+class UserRead(BaseModel):
+    id: str
+    username: str
+    email: str
+    full_name: str | None
+    role: str
+    company_id: str | None
+    is_active: bool
+
+    model_config = {"from_attributes": True}

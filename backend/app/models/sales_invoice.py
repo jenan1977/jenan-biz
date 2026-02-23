@@ -20,7 +20,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.constants import InvoiceStatus, PaymentStatus
+from app.core.constants import TAX_RATE, InvoiceStatus, PaymentStatus
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
@@ -94,6 +94,16 @@ class SalesInvoice(BaseModel):
     due_date: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
+    )
+
+    # ------------------------------------------------------------------
+    # Tax rate
+    # ------------------------------------------------------------------
+    tax_rate: Mapped[Decimal] = mapped_column(
+        Numeric(5, 4),
+        nullable=False,
+        default=Decimal(str(TAX_RATE)),
+        comment="Tax rate applied to this invoice (e.g. 0.15 = 15%)",
     )
 
     # ------------------------------------------------------------------
