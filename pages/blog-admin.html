@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المدونة - جنان بيز</title>
+    <link rel="stylesheet" href="../css/blog.css">
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+    <header class="blog-header">
+        <div class="container header-content">
+            <a href="blog.html" class="logo-link"><h1>جنان بيز</h1></a>
+            <nav class="blog-nav">
+                <a href="blog-editor.html" class="btn btn-primary">+ مقالة جديدة</a>
+                <a href="blog-list.html">عرض المدونة</a>
+                <a href="../index.html">الرئيسية</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container admin-main">
+        <h2>لوحة تحكم المدونة</h2>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="stat-total">-</span>
+                <span class="stat-label">إجمالي المقالات</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="stat-published">-</span>
+                <span class="stat-label">منشور</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="stat-draft">-</span>
+                <span class="stat-label">مسودات</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="stat-views">-</span>
+                <span class="stat-label">إجمالي المشاهدات</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab('articles', this)">المقالات</button>
+            <button class="tab-btn" onclick="switchTab('categories', this)">الفئات</button>
+            <button class="tab-btn" onclick="switchTab('tags', this)">الوسوم</button>
+            <button class="tab-btn" onclick="switchTab('comments', this)">التعليقات</button>
+        </div>
+
+        <!-- Articles Tab -->
+        <div class="tab-content active" id="tab-articles">
+            <div class="tab-header">
+                <input type="text" id="admin-search" placeholder="بحث في المقالات..." class="search-input">
+                <select id="admin-status-filter" class="filter-select">
+                    <option value="">الكل</option>
+                    <option value="published">منشور</option>
+                    <option value="draft">مسودة</option>
+                </select>
+            </div>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>العنوان</th>
+                        <th>الفئة</th>
+                        <th>الحالة</th>
+                        <th>المشاهدات</th>
+                        <th>التاريخ</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="articles-table-body">
+                    <tr><td colspan="6" class="loading">جارٍ التحميل...</td></tr>
+                </tbody>
+            </table>
+            <div class="pagination" id="admin-pagination"></div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div class="tab-content" id="tab-categories" style="display:none">
+            <div class="tab-header">
+                <button onclick="showAddCategoryForm()" class="btn btn-primary">+ فئة جديدة</button>
+            </div>
+            <div id="category-form" style="display:none" class="inline-form">
+                <input type="text" id="cat-name" placeholder="اسم الفئة">
+                <input type="text" id="cat-desc" placeholder="الوصف (اختياري)">
+                <button onclick="addCategory()" class="btn btn-primary">إضافة</button>
+                <button onclick="hideCategoryForm()" class="btn btn-secondary">إلغاء</button>
+            </div>
+            <div id="categories-list"></div>
+        </div>
+
+        <!-- Tags Tab -->
+        <div class="tab-content" id="tab-tags" style="display:none">
+            <div class="tab-header">
+                <button onclick="showAddTagForm()" class="btn btn-primary">+ وسم جديد</button>
+            </div>
+            <div id="tag-form" style="display:none" class="inline-form">
+                <input type="text" id="tag-name" placeholder="اسم الوسم">
+                <button onclick="addTag()" class="btn btn-primary">إضافة</button>
+                <button onclick="hideTagForm()" class="btn btn-secondary">إلغاء</button>
+            </div>
+            <div id="tags-list"></div>
+        </div>
+
+        <!-- Comments Tab -->
+        <div class="tab-content" id="tab-comments" style="display:none">
+            <div id="comments-admin-list">
+                <p class="placeholder-text">اختر مقالة لعرض تعليقاتها.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="blog-footer">
+        <div class="container">
+            <p>© 2026 جنان بيز - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <script src="../js/blog-api.js"></script>
+    <script src="../js/blog-renderer.js"></script>
+    <script>
+        let adminPage = 1;
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tab).style.display = 'block';
+            if (btn) btn.classList.add('active');
+            if (tab === 'categories') loadCategoriesAdmin();
+            if (tab === 'tags') loadTagsAdmin();
+        }
+
+        async function loadAdminArticles(page = 1) {
+            const search = document.getElementById('admin-search').value;
+            const status = document.getElementById('admin-status-filter').value;
+            const data = await blogApi.listArticles({ page, per_page: 20, status, search });
+            renderAdminTable(data.items);
+            renderPagination('admin-pagination', data, loadAdminArticles);
+            updateStats(data);
+        }
+
+        function renderAdminTable(articles) {
+            const tbody = document.getElementById('articles-table-body');
+            if (!articles.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty">لا توجد مقالات</td></tr>';
+                return;
+            }
+            tbody.innerHTML = articles.map(a => `
+                <tr>
+                    <td><a href="blog-detail.html?slug=${a.slug}">${a.title}</a></td>
+                    <td>${a.category ? a.category.name : '-'}</td>
+                    <td><span class="status-badge status-${a.status}">${a.status === 'published' ? 'منشور' : 'مسودة'}</span></td>
+                    <td>${a.views || 0}</td>
+                    <td>${new Date(a.created_at).toLocaleDateString('ar-SA')}</td>
+                    <td>
+                        <a href="blog-editor.html?id=${a.id}" class="action-btn">✏️ تعديل</a>
+                        <button onclick="deleteArticle('${a.id}')" class="action-btn action-delete">🗑️ حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteArticle(id) {
+            if (!confirm('هل أنت متأكد من حذف هذه المقالة؟')) return;
+            await blogApi.deleteArticle(id);
+            loadAdminArticles(adminPage);
+        }
+
+        function updateStats(data) {
+            document.getElementById('stat-total').textContent = data.total || 0;
+        }
+
+        async function loadCategoriesAdmin() {
+            const cats = await blogApi.listCategories();
+            const el = document.getElementById('categories-list');
+            el.innerHTML = cats.map(c => `<div class="list-item"><span>${c.name}</span><small>${c.slug}</small></div>`).join('');
+        }
+
+        async function loadTagsAdmin() {
+            const tags = await blogApi.listTags();
+            const el = document.getElementById('tags-list');
+            el.innerHTML = tags.map(t => `<span class="tag-chip">${t.name}</span>`).join('');
+        }
+
+        async function addCategory() {
+            const name = document.getElementById('cat-name').value.trim();
+            const description = document.getElementById('cat-desc').value.trim();
+            if (!name) return;
+            await blogApi.createCategory({ name, description });
+            hideCategoryForm();
+            loadCategoriesAdmin();
+        }
+
+        async function addTag() {
+            const name = document.getElementById('tag-name').value.trim();
+            if (!name) return;
+            await blogApi.createTag({ name });
+            hideTagForm();
+            loadTagsAdmin();
+        }
+
+        function showAddCategoryForm() { document.getElementById('category-form').style.display = 'flex'; }
+        function hideCategoryForm() { document.getElementById('category-form').style.display = 'none'; }
+        function showAddTagForm() { document.getElementById('tag-form').style.display = 'flex'; }
+        function hideTagForm() { document.getElementById('tag-form').style.display = 'none'; }
+
+        (async function init() {
+            await loadAdminArticles(1);
+        })();
+    </script>
+</body>
+</html>

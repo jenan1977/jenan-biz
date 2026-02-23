@@ -14,6 +14,7 @@ from app.models.purchase_invoice import PurchaseInvoice
 from app.models.purchase_line_item import PurchaseLineItem
 from app.models.inventory import Inventory
 from app.models.job import Job
+from app.blog.models import Article, ArticleTag, Category, Comment, Tag
 
 __all__ = [
     "Base",
@@ -28,4 +29,9 @@ __all__ = [
     "PurchaseLineItem",
     "Inventory",
     "Job",
+    "Article",
+    "ArticleTag",
+    "Category",
+    "Comment",
+    "Tag",
 ]
