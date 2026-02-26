@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>جنان بيز – محلل المشاريع</title>
+  <style>
+    /* ── Reset & Base ──────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #2563eb;
+      --primary-dk: #1d4ed8;
+      --success:    #16a34a;
+      --danger:     #dc2626;
+      --warn:       #d97706;
+      --bg:         #f8fafc;
+      --surface:    #ffffff;
+      --border:     #e2e8f0;
+      --text:       #1e293b;
+      --muted:      #64748b;
+      --radius:     0.75rem;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ────────────────────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+
+    header .logo { font-size: 1.8rem; }
+    header h1   { font-size: 1.4rem; font-weight: 700; }
+    header p    { font-size: 0.85rem; opacity: .85; margin-top: .2rem; }
+
+    /* ── Layout ─────────────────────────────────────────────────────────────── */
+    main {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    /* ── Form ────────────────────────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: .35rem; }
+    .form-group label { font-size: .85rem; font-weight: 600; color: var(--muted); }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: .6rem .8rem;
+      border: 1px solid var(--border);
+      border-radius: .5rem;
+      font-size: .9rem;
+      font-family: inherit;
+      background: var(--bg);
+      transition: border-color .2s, box-shadow .2s;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      padding: .7rem 1.4rem;
+      border: none;
+      border-radius: .5rem;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+
+    .btn:active { transform: scale(.98); }
+
+    .btn-primary  { background: var(--primary);  color: #fff; }
+    .btn-primary:hover { background: var(--primary-dk); }
+
+    .btn-success  { background: var(--success);  color: #fff; }
+    .btn-success:hover { background: #15803d; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline:hover { background: rgba(37,99,235,.07); }
+
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .actions { display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1.25rem; }
+
+    /* ── Progress ────────────────────────────────────────────────────────────── */
+    #progress-section { display: none; }
+
+    .progress-bar-wrap {
+      background: var(--border);
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--primary), #60a5fa);
+      transition: width .4s ease;
+      width: 0%;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: .4rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: .25rem .7rem;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .badge-pending    { background: #fef9c3; color: #854d0e; }
+    .badge-running    { background: #dbeafe; color: #1d4ed8; }
+    .badge-completed  { background: #dcfce7; color: #166534; }
+    .badge-failed     { background: #fee2e2; color: #991b1b; }
+
+    /* ── Results ─────────────────────────────────────────────────────────────── */
+    #results-section { display: none; }
+
+    #analysis-output {
+      white-space: pre-wrap;
+      font-size: .9rem;
+      line-height: 1.7;
+      color: var(--text);
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: .5rem;
+    }
+
+    .download-actions { display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1rem; }
+
+    /* ── Alerts ──────────────────────────────────────────────────────────────── */
+    .alert {
+      padding: .85rem 1rem;
+      border-radius: .5rem;
+      font-size: .88rem;
+      margin-top: .75rem;
+      display: none;
+    }
+
+    .alert-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .alert-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+
+    /* ── Responsive ──────────────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      header { padding: 1rem; flex-direction: column; text-align: center; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🚀</div>
+  <div>
+    <h1>جنان بيز – محلل المشاريع</h1>
+    <p>أدخل بيانات مشروعك واحصل على تحليل شامل مدعوم بالذكاء الاصطناعي</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Form card ──────────────────────────────────────────────────────── -->
+  <div class="card" id="form-card">
+    <div class="card-title">📋 بيانات المشروع</div>
+
+    <form id="analyzer-form" novalidate>
+      <div class="form-grid">
+
+        <!-- Section 1: Basic Info -->
+        <div class="form-group">
+          <label for="projectName">اسم المشروع *</label>
+          <input id="projectName" name="projectName" type="text" placeholder="مثال: منصة تجارة إلكترونية" required />
+        </div>
+
+        <div class="form-group">
+          <label for="industry">القطاع / الصناعة *</label>
+          <select id="industry" name="industry" required>
+            <option value="">اختر القطاع…</option>
+            <option>التجارة الإلكترونية</option>
+            <option>التقنية والبرمجيات</option>
+            <option>الغذاء والمشروبات</option>
+            <option>الصحة والعافية</option>
+            <option>التعليم والتدريب</option>
+            <option>العقارات</option>
+            <option>النقل واللوجستيات</option>
+            <option>السياحة والسفر</option>
+            <option>الإعلام والترفيه</option>
+            <option>الخدمات المالية</option>
+            <option>الزراعة والبيئة</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="businessModel">نموذج العمل *</label>
+          <select id="businessModel" name="businessModel" required>
+            <option value="">اختر النموذج…</option>
+            <option>B2C – أعمال للمستهلك</option>
+            <option>B2B – أعمال للأعمال</option>
+            <option>B2B2C – مختلط</option>
+            <option>C2C – مستهلك للمستهلك</option>
+            <option>SaaS – برمجيات كخدمة</option>
+            <option>Marketplace – سوق رقمي</option>
+            <option>Subscription – اشتراكات</option>
+            <option>Freemium</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="targetMarket">السوق المستهدف (جغرافياً)</label>
+          <input id="targetMarket" name="targetMarket" type="text" placeholder="مثال: المملكة العربية السعودية، الخليج العربي" />
+        </div>
+
+        <div class="form-group">
+          <label for="targetAudience">الجمهور المستهدف</label>
+          <input id="targetAudience" name="targetAudience" type="text" placeholder="مثال: شباب 18-35 سنة، أصحاب الأعمال" />
+        </div>
+
+        <div class="form-group">
+          <label for="stage">مرحلة المشروع</label>
+          <select id="stage" name="stage">
+            <option value="">اختر المرحلة…</option>
+            <option>فكرة (Idea)</option>
+            <option>نموذج أولي (MVP)</option>
+            <option>إطلاق مبكر (Early Stage)</option>
+            <option>نمو (Growth)</option>
+            <option>توسع (Scale)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="teamSize">حجم الفريق الحالي</label>
+          <input id="teamSize" name="teamSize" type="number" min="1" placeholder="عدد الأشخاص" />
+        </div>
+
+        <div class="form-group">
+          <label for="initialCapital">رأس المال الأولي المتاح (USD)</label>
+          <input id="initialCapital" name="initialCapital" type="number" min="0" placeholder="مثال: 50000" />
+        </div>
+
+        <div class="form-group">
+          <label for="expectedRevenue">الإيراد السنوي المتوقع (USD)</label>
+          <input id="expectedRevenue" name="expectedRevenue" type="number" min="0" placeholder="مثال: 500000" />
+        </div>
+
+        <div class="form-group">
+          <label for="breakEvenMonths">الوصول لنقطة التعادل (أشهر)</label>
+          <input id="breakEvenMonths" name="breakEvenMonths" type="number" min="1" placeholder="مثال: 18" />
+        </div>
+
+        <div class="form-group">
+          <label for="mainCompetitors">المنافسون الرئيسيون</label>
+          <input id="mainCompetitors" name="mainCompetitors" type="text" placeholder="مثال: شركة X، شركة Y" />
+        </div>
+
+        <div class="form-group">
+          <label for="uniqueValue">الميزة التنافسية</label>
+          <input id="uniqueValue" name="uniqueValue" type="text" placeholder="ما الذي يميزك؟" />
+        </div>
+
+        <div class="form-group">
+          <label for="mainChallenge">أبرز التحديات المتوقعة</label>
+          <input id="mainChallenge" name="mainChallenge" type="text" placeholder="أكبر عقبة أمام النجاح" />
+        </div>
+
+        <div class="form-group">
+          <label for="technologyStack">التقنيات المستخدمة (إن وُجدت)</label>
+          <input id="technologyStack" name="technologyStack" type="text" placeholder="مثال: React, Node.js, AWS" />
+        </div>
+
+        <div class="form-group">
+          <label for="priority">أولوية التحليل (1 أعلى)</label>
+          <select id="priority" name="priority">
+            <option value="5">عادية (5)</option>
+            <option value="1">عالية جداً (1)</option>
+            <option value="3">عالية (3)</option>
+            <option value="7">منخفضة (7)</option>
+            <option value="10">منخفضة جداً (10)</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label for="projectDescription">وصف المشروع التفصيلي *</label>
+          <textarea id="projectDescription" name="projectDescription" rows="5"
+            placeholder="اشرح فكرة مشروعك بالتفصيل: المشكلة التي يحلها، الحل المقترح، كيف سيعمل النموذج…" required></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label for="additionalNotes">ملاحظات إضافية</label>
+          <textarea id="additionalNotes" name="additionalNotes" rows="3"
+            placeholder="أي معلومات إضافية تريد مشاركتها مع المحلل…"></textarea>
+        </div>
+
+      </div><!-- /.form-grid -->
+
+      <div class="alert alert-error" id="form-error"></div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          🔍 تحليل المشروع
+        </button>
+        <button type="button" class="btn btn-outline" id="reset-btn">
+          🔄 إعادة تعيين
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Progress card ───────────────────────────────────────────────────── -->
+  <div class="card" id="progress-section">
+    <div class="card-title">⏳ جارٍ التحليل…</div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-label">
+      <span id="progress-text">جارٍ معالجة الطلب…</span>
+      <span id="status-badge" class="status-badge badge-pending">pending</span>
+    </div>
+
+    <div class="alert alert-error" id="progress-error" style="margin-top:.75rem;"></div>
+  </div>
+
+  <!-- ── Results card ────────────────────────────────────────────────────── -->
+  <div class="card" id="results-section">
+    <div class="card-title">📊 نتائج التحليل</div>
+
+    <pre id="analysis-output"></pre>
+
+    <div class="download-actions">
+      <button class="btn btn-success" id="copy-btn">📋 نسخ النتائج</button>
+      <button class="btn btn-outline" id="new-analysis-btn">➕ تحليل جديد</button>
+    </div>
+
+    <div class="alert alert-success" id="copy-alert">✅ تم نسخ النتائج إلى الحافظة!</div>
+  </div>
+
+</main>
+
+<script>
+  "use strict";
+
+  // ── Configuration ──────────────────────────────────────────────────────────
+  const API_BASE = "/api/analyzer";
+  const POLL_INTERVAL_MS = 2000;
+  const MAX_POLL_ATTEMPTS = 60; // 2 min timeout
+
+  // ── DOM refs ───────────────────────────────────────────────────────────────
+  const form           = document.getElementById("analyzer-form");
+  const submitBtn      = document.getElementById("submit-btn");
+  const resetBtn       = document.getElementById("reset-btn");
+  const formError      = document.getElementById("form-error");
+  const progressSec    = document.getElementById("progress-section");
+  const progressFill   = document.getElementById("progress-fill");
+  const progressText   = document.getElementById("progress-text");
+  const statusBadge    = document.getElementById("status-badge");
+  const progressError  = document.getElementById("progress-error");
+  const resultsSec     = document.getElementById("results-section");
+  const analysisOutput = document.getElementById("analysis-output");
+  const copyBtn        = document.getElementById("copy-btn");
+  const newAnalysisBtn = document.getElementById("new-analysis-btn");
+  const copyAlert      = document.getElementById("copy-alert");
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  function showAlert(el, msg) {
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+
+  function hideAlert(el) { el.style.display = "none"; }
+
+  function setProgress(pct, label) {
+    progressFill.style.width = `${Math.min(pct, 100)}%`;
+    progressText.textContent = label;
+  }
+
+  function setBadge(status) {
+    const classMap = {
+      pending:   "badge-pending",
+      running:   "badge-running",
+      completed: "badge-completed",
+      failed:    "badge-failed",
+    };
+    statusBadge.className = "status-badge " + (classMap[status] || "badge-pending");
+    statusBadge.textContent = status;
+  }
+
+  function collectFormData() {
+    const data = {};
+    const fields = form.querySelectorAll("input, select, textarea");
+    fields.forEach(f => {
+      if (f.name && f.value.trim()) data[f.name] = f.value.trim();
+    });
+    return data;
+  }
+
+  // ── Poll job status ─────────────────────────────────────────────────────────
+
+  async function pollJob(jobId) {
+    let attempts = 0;
+    const fakeProgress = [10, 20, 35, 50, 65, 78, 88, 94];
+    let progressIdx = 0;
+
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(async () => {
+        attempts++;
+
+        // Animate progress bar while waiting
+        if (progressIdx < fakeProgress.length) {
+          setProgress(fakeProgress[progressIdx++], "جارٍ التحليل…");
+        }
+
+        if (attempts > MAX_POLL_ATTEMPTS) {
+          clearInterval(interval);
+          reject(new Error("انتهت مهلة انتظار التحليل. يُرجى المحاولة مجدداً."));
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/jobs/${jobId}`);
+          const data = await res.json();
+
+          setBadge(data.status);
+
+          if (data.status === "completed") {
+            clearInterval(interval);
+            setProgress(100, "اكتمل التحليل ✓");
+            resolve(data.result);
+          } else if (data.status === "failed") {
+            clearInterval(interval);
+            reject(new Error(data.error || "فشل التحليل. يُرجى المحاولة مجدداً."));
+          }
+        } catch (err) {
+          // Network hiccup – keep polling
+          console.warn("Poll error:", err.message);
+        }
+      }, POLL_INTERVAL_MS);
+    });
+  }
+
+  // ── Form submit ─────────────────────────────────────────────────────────────
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideAlert(formError);
+    hideAlert(progressError);
+
+    const formData = collectFormData();
+
+    // Client-side validation
+    if (!formData.projectName) {
+      return showAlert(formError, "⚠️ يُرجى إدخال اسم المشروع.");
+    }
+    if (!formData.projectDescription) {
+      return showAlert(formError, "⚠️ يُرجى كتابة وصف تفصيلي للمشروع.");
+    }
+
+    // Build request
+    const { priority = "5", projectDescription, ...context } = formData;
+    const body = {
+      message: projectDescription,
+      context,
+      priority: parseInt(priority, 10),
+    };
+
+    // Show progress section
+    submitBtn.disabled = true;
+    progressSec.style.display = "block";
+    resultsSec.style.display = "none";
+    setProgress(5, "إرسال الطلب…");
+    setBadge("pending");
+
+    try {
+      // Submit job
+      const submitRes = await fetch(API_BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!submitRes.ok) {
+        const err = await submitRes.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `خطأ في الإرسال (${submitRes.status})`);
+      }
+
+      const { jobId } = await submitRes.json();
+      setBadge("running");
+      setProgress(8, "جارٍ معالجة الطلب في الطابور…");
+
+      // Poll until done
+      const result = await pollJob(jobId);
+
+      // Show results
+      progressSec.style.display = "none";
+      resultsSec.style.display = "block";
+      analysisOutput.textContent = result?.analysis || JSON.stringify(result, null, 2);
+
+    } catch (err) {
+      setProgress(0, "حدث خطأ");
+      setBadge("failed");
+      showAlert(progressError, "❌ " + err.message);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  // ── Copy button ─────────────────────────────────────────────────────────────
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(analysisOutput.textContent);
+      copyAlert.style.display = "block";
+      setTimeout(() => { copyAlert.style.display = "none"; }, 3000);
+    } catch {
+      copyAlert.style.display = "none";
+    }
+  });
+
+  // ── New analysis ────────────────────────────────────────────────────────────
+  newAnalysisBtn.addEventListener("click", () => {
+    resultsSec.style.display = "none";
+    progressSec.style.display = "none";
+    form.reset();
+    hideAlert(formError);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // ── Reset button ────────────────────────────────────────────────────────────
+  resetBtn.addEventListener("click", () => {
+    form.reset();
+    hideAlert(formError);
+  });
+</script>
+
+</body>
+</html>
