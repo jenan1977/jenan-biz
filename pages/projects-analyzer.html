@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل المشاريع - جنان بيز</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status-text {
+            margin-top: 10px;
+            color: #666;
+            text-align: center;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-right: 4px solid #667eea;
+        }
+
+        .result-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .result-content {
+            color: #555;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .error-section {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #fee;
+            border-radius: 6px;
+            border-right: 4px solid #e74c3c;
+            color: #c0392b;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 تحليل المشروع الذكي</h1>
+        <p class="subtitle">أدخل معلومات مشروعك واحصل على تحليل شامل من AI</p>
+
+        <form id="analyzerForm">
+            <div class="form-group">
+                <label for="projectName">اسم المشروع *</label>
+                <input
+                    type="text"
+                    id="projectName"
+                    placeholder="مثال: متجر إلكتروني للملابس"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="description">وصف المشروع *</label>
+                <textarea
+                    id="description"
+                    placeholder="اكتب وصفاً تفصيلياً لمشروعك..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="budget">الميزانية (بالريال السعودي)</label>
+                <input
+                    type="number"
+                    id="budget"
+                    placeholder="مثال: 50000"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="goals">الأهداف الرئيسية</label>
+                <textarea
+                    id="goals"
+                    placeholder="اكتب أهداف مشروعك..."
+                ></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                تحليل المشروع الآن
+            </button>
+        </form>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p class="status-text">
+                جاري التحليل <span class="spinner"></span>
+            </p>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section" id="resultSection">
+            <h3>📊 نتائج التحليل</h3>
+            <div class="result-content" id="resultContent"></div>
+        </div>
+
+        <!-- Error Section -->
+        <div class="error-section" id="errorSection">
+            <strong>خطأ:</strong>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('analyzerForm')
+        const submitBtn = document.getElementById('submitBtn')
+        const progressSection = document.getElementById('progressSection')
+        const resultSection = document.getElementById('resultSection')
+        const errorSection = document.getElementById('errorSection')
+        const resultContent = document.getElementById('resultContent')
+        const errorMessage = document.getElementById('errorMessage')
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+
+            const formData = {
+                projectName: document.getElementById('projectName').value,
+                description: document.getElementById('description').value,
+                budget: document.getElementById('budget').value || 0,
+                goals: document.getElementById('goals').value
+            }
+
+            submitBtn.disabled = true
+            progressSection.style.display = 'block'
+            resultSection.style.display = 'none'
+            errorSection.style.display = 'none'
+
+            try {
+                const response = await fetch('/api/analyzer/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                })
+
+                const data = await response.json()
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'حدث خطأ')
+                }
+
+                pollResult(data.jobId)
+            } catch (error) {
+                progressSection.style.display = 'none'
+                errorSection.style.display = 'block'
+                errorMessage.textContent = error.message
+                submitBtn.disabled = false
+            }
+        })
+
+        function pollResult (jobId) {
+            const maxAttempts = 120 // 2 minutes max
+            let attempts = 0
+
+            const interval = setInterval(async () => {
+                attempts++
+
+                try {
+                    const response = await fetch('/api/analyzer/jobs/' + jobId)
+                    const data = await response.json()
+
+                    if (data.status === 'completed') {
+                        clearInterval(interval)
+                        progressSection.style.display = 'none'
+                        resultSection.style.display = 'block'
+                        resultContent.textContent = data.result
+                        submitBtn.disabled = false
+                    } else if (data.status === 'failed') {
+                        clearInterval(interval)
+                        progressSection.style.display = 'none'
+                        errorSection.style.display = 'block'
+                        errorMessage.textContent = data.error || 'فشل التحليل'
+                        submitBtn.disabled = false
+                    }
+
+                    if (attempts >= maxAttempts) {
+                        clearInterval(interval)
+                        progressSection.style.display = 'none'
+                        errorSection.style.display = 'block'
+                        errorMessage.textContent = 'انتهت مهلة الانتظار'
+                        submitBtn.disabled = false
+                    }
+                } catch (err) {
+                    // Continue polling even on fetch errors
+                }
+            }, 1000)
+        }
+    </script>
+</body>
+</html>
